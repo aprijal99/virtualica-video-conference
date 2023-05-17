@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  postgres-ngobrol:
+    image: postgres:15.3-alpine3.18
+    container_name: postgres-ngobrol
+    restart: always
+    ports:
+      - "10543:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres-ngobrol
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
