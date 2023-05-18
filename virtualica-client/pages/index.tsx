@@ -10,7 +10,7 @@ const OFFER: string = 'OFFER';
 const ANSWER: string = 'ANSWER';
 const CANDIDATE: string = 'CANDIDATE';
 
-const conn: WebSocket = new WebSocket(process.env.NEXT_PUBLIC_WEBSOCKET_URL);
+const conn: WebSocket = new WebSocket('wss://virtualica-signaling-server.onrender.com/socket');
 
 export default function Home() {
   const inputMessageRef = createRef<HTMLInputElement>();
