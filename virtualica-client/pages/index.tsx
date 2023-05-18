@@ -1,98 +1,122 @@
 import Head from 'next/head'
-import {createRef} from 'react';
+import {createRef, useEffect} from 'react';
 
 type MessageType = {
   event: string,
   data: RTCSessionDescriptionInit | RTCIceCandidate,
 }
 
+const OFFER: string = 'OFFER';
+const ANSWER: string = 'ANSWER';
+const CANDIDATE: string = 'CANDIDATE';
+
 const conn: WebSocket = new WebSocket('ws://localhost:7181/socket');
 
 export default function Home() {
   const inputMessageRef = createRef<HTMLInputElement>();
 
-  conn.onopen = () => {
-    console.log('Connected to the signaling server');
-    // initialize();
-  }
+  conn.onopen = () => console.log('Connected to the signaling server');
 
   conn.onmessage = (ev) => {
-    console.log(`Got message: ${ev.data}`);
-    // const message: MessageType = JSON.parse(ev.data);
-    // const data = message.data;
-    //
-    // switch (message.event) {
-    //   case 'offer':
-    //     handleOffer(data as RTCSessionDescriptionInit);
-    //     break;
-    //   case 'answer':
-    //     handleAnswer(data as RTCSessionDescriptionInit);
-    //     break;
-    //   case 'candidate':
-    //     handleCandidate(data as RTCIceCandidate);
-    //     break;
-    //   default:
-    //     break;
-    // }
+    const message: MessageType = JSON.parse(ev.data);
+
+    switch (message.event) {
+      case OFFER:
+        console.log('Receiving an offer');
+        handleOffer(message.data as RTCSessionDescriptionInit);
+        break;
+      case ANSWER:
+        console.log('Receiving an answer');
+        handleAnswer(message.data as RTCSessionDescriptionInit);
+        break;
+      case CANDIDATE:
+        console.log('Receiving an ICE candidate');
+        handleCandidate(message.data as RTCIceCandidate);
+        break;
+      default:
+        break;
+    }
   }
 
-  // let peerConnection: RTCPeerConnection;
-  // let dataChannel: RTCDataChannel;
-  //
-  // const send = (message: MessageType) => conn.send(JSON.stringify(message));
-  //
-  // const initialize = () => {
-  //   let configuration = null;
-  //   peerConnection = new RTCPeerConnection(configuration);
-  //
-  //   // Setup ice handling
-  //   peerConnection.onicecandidate = (ev) => {
-  //     if (ev.candidate) send({ event: 'candidate', data: ev.candidate, });
-  //   }
-  //
-  //   // Creating data channel
-  //   dataChannel = peerConnection.createDataChannel("dataChannel");
-  //
-  //   dataChannel.onerror = () => console.log('Error on datachannel');
-  //   dataChannel.onmessage = (ev) => console.log(`Message: ${ev.data}`);
-  //   dataChannel.onclose = () => console.log('Datachannel is closed');
-  //
-  //   peerConnection.ondatachannel = (ev) => dataChannel = ev.channel;
-  // }
-  //
-  // const createOffer = () => {
-  //   peerConnection.createOffer()
-  //     .then((offer) => {
-  //       send({ event: 'offer', data: offer, });
-  //       peerConnection.setLocalDescription(offer);
-  //     })
-  //     .catch(() => console.log('Error creating an offer'));
-  // }
-  //
-  // const handleOffer = (offer: RTCSessionDescriptionInit) => {
-  //   peerConnection.setRemoteDescription(offer);
-  //
-  //   peerConnection.createAnswer()
-  //     .then((answer) => {
-  //       peerConnection.setLocalDescription(answer);
-  //       send({ event: 'answer', data: answer, });
-  //     })
-  //     .catch(() => console.log('Error creating an answer'));
-  // }
-  //
-  // const handleCandidate = (candidate: RTCIceCandidate) => {
-  //   peerConnection.addIceCandidate(candidate);
-  // }
-  //
-  // const handleAnswer = (answer: RTCSessionDescriptionInit) => {
-  //   peerConnection.setRemoteDescription(answer)
-  //     .then(() => console.log('Connection established successfully'));
-  // }
+  let peerConnection: RTCPeerConnection;
+  let dataChannel: RTCDataChannel;
 
-  const sendMessage = () => {
-    if (inputMessageRef.current) {
-      // dataChannel.send(inputMessageRef.current.value);
-      conn.send(inputMessageRef.current.value);
+  useEffect(() => {
+    peerConnection = new RTCPeerConnection();
+    dataChannel = peerConnection.createDataChannel("channel");
+
+    peerConnection.onicecandidate = (ev) => {
+      if (ev.candidate) {
+        sendToSignalingServer({ event: CANDIDATE, data: ev.candidate, });
+      }
+    }
+
+    dataChannel.onopen = () => console.log('Channel connected')
+    dataChannel.onmessage = (ev) => console.log(`New message: ${ev.data}`);
+    dataChannel.onclose = () => console.log('Channel closed');
+    dataChannel.onerror = () => console.log('Error on channel');
+
+    peerConnection.ondatachannel = (ev) => {
+      dataChannel = ev.channel;
+      console.log('Channel connected');
+    }
+  }, []);
+
+  const sendToSignalingServer = (message: MessageType) => {
+    conn.send(JSON.stringify(message));
+  }
+
+  const requestConnection = () => {
+    if (peerConnection) {
+      peerConnection.createOffer()
+        .then((sessionDescription) => {
+          peerConnection.setLocalDescription(sessionDescription)
+            .then(() => console.log('Succeed setting local description'))
+            .catch(() => console.log('Failed setting local description'));
+          sendToSignalingServer({ event: OFFER, data: sessionDescription, });
+        })
+        .then(() => console.log('Succeed creating offer and sent it to signaling server'))
+        .catch(() => console.log('Failed creating offer and sent it to signaling server'));
+    }
+  }
+
+  const handleOffer = (offer: RTCSessionDescriptionInit) => {
+    if (peerConnection) {
+      peerConnection.setRemoteDescription(offer)
+        .then(() => console.log('Succeed setting remote description'))
+        .catch(() => console.log('Failed setting remote description'));
+
+      peerConnection.createAnswer()
+        .then((answer) => {
+          peerConnection.setLocalDescription(answer)
+            .then(() => console.log('Succeed setting local description'))
+            .catch(() => console.log('Failed setting local description'));
+          sendToSignalingServer({ event: ANSWER, data: answer, });
+        })
+        .then(() => console.log('Succeed creating answer and sent it to signaling server'))
+        .catch(() => console.log('Failed creating answer and sent it to signaling server'));
+    }
+  }
+
+  const handleAnswer = (answer: RTCSessionDescriptionInit) => {
+    if (peerConnection) {
+      peerConnection.setRemoteDescription(answer)
+        .then(() => console.log('Succeed setting remote description'))
+        .catch(() => console.log('Failed setting remote description'));
+    }
+  }
+
+  const handleCandidate = (candidate: RTCIceCandidate) => {
+    if (peerConnection) {
+      peerConnection.addIceCandidate(candidate)
+        .then(() => console.log('Succeed setting ICE candidate'))
+        .catch(() => console.log('Failed setting ICE candidate'));
+    }
+  }
+
+  const sendMessageToChannel = () => {
+    if (inputMessageRef.current && (inputMessageRef.current.value !== '') && dataChannel) {
+      dataChannel.send(inputMessageRef.current.value);
       inputMessageRef.current.value = '';
     }
   }
@@ -106,9 +130,12 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        {/*<button type='button' onClick={createOffer}>Create offer</button>*/}
+        <div>
+          <button type='button' onClick={requestConnection}>Request Connection</button>
+        </div>
+
         <input type='text' ref={inputMessageRef} />
-        <button type='button' onClick={sendMessage}>Send</button>
+        <button type='button' onClick={sendMessageToChannel}>Send</button>
       </main>
     </>
   );
