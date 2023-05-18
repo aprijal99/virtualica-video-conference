@@ -10,7 +10,7 @@ const OFFER: string = 'OFFER';
 const ANSWER: string = 'ANSWER';
 const CANDIDATE: string = 'CANDIDATE';
 
-const conn: WebSocket = new WebSocket('ws://localhost:7181/socket');
+const conn: WebSocket = new WebSocket(process.env.NEXT_PUBLIC_WEBSOCKET_URL);
 
 export default function Home() {
   const inputMessageRef = createRef<HTMLInputElement>();
