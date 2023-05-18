@@ -1,14 +1,14 @@
-FROM maven:3.9.1-eclipse-temurin-11-alpine as package
+FROM maven:3.9.2-eclipse-temurin-17-alpine as package
 WORKDIR package
 COPY . .
 RUN mvn clean install package spring-boot:repackage
 
-FROM eclipse-temurin:11-jre-alpine as extract
+FROM eclipse-temurin:17-jre-alpine as extract
 WORKDIR extract
 COPY --from=package package/target/*.jar app.jar
 RUN java -Djarmode=layertools -jar app.jar extract
 
-FROM eclipse-temurin:11-jre-alpine
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR application
 COPY --from=extract extract/dependencies/ ./
 COPY --from=extract extract/spring-boot-loader/ ./
