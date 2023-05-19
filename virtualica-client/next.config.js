@@ -4,7 +4,7 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_SERVER_URL: 'https://virtualica-signaling-server.onrender.com',
   },
-  output: 'standalone',
+  // output: 'standalone',
 }
 
 module.exports = nextConfig

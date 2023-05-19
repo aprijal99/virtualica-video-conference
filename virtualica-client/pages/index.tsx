@@ -10,10 +10,13 @@ const OFFER: string = 'OFFER';
 const ANSWER: string = 'ANSWER';
 const CANDIDATE: string = 'CANDIDATE';
 
-const conn: WebSocket = new WebSocket('wss://virtualica-signaling-server.onrender.com/socket');
+const conn: WebSocket = new WebSocket('ws://localhost:7181/socket');
+// const conn: WebSocket = new WebSocket('wss://virtualica-signaling-server.onrender.com/socket');
 
 export default function Home() {
   const inputMessageRef = createRef<HTMLInputElement>();
+  const myVideoContainerRef = createRef<HTMLDivElement>();
+  const anotherVideoContainerRef = createRef<HTMLDivElement>();
 
   conn.onopen = () => console.log('Connected to the signaling server');
 
@@ -40,10 +43,21 @@ export default function Home() {
 
   let peerConnection: RTCPeerConnection;
   let dataChannel: RTCDataChannel;
+  let localStream: MediaStream;
 
   useEffect(() => {
-    peerConnection = new RTCPeerConnection();
+    peerConnection = new RTCPeerConnection({
+      iceServers: [
+        {'urls': 'stun:stun.stunprotocol.org:3478'},
+        {'urls': 'stun:stun.l.google.com:19302'},
+      ],
+    });
     dataChannel = peerConnection.createDataChannel("channel");
+
+    dataChannel.onopen = () => console.log('Channel connected')
+    dataChannel.onmessage = (ev) => console.log(`New message: ${ev.data}`);
+    dataChannel.onclose = () => console.log('Channel closed');
+    dataChannel.onerror = () => console.log('Error on channel');
 
     peerConnection.onicecandidate = (ev) => {
       if (ev.candidate) {
@@ -51,15 +65,38 @@ export default function Home() {
       }
     }
 
-    dataChannel.onopen = () => console.log('Channel connected')
-    dataChannel.onmessage = (ev) => console.log(`New message: ${ev.data}`);
-    dataChannel.onclose = () => console.log('Channel closed');
-    dataChannel.onerror = () => console.log('Error on channel');
-
     peerConnection.ondatachannel = (ev) => {
       dataChannel = ev.channel;
       console.log('Channel connected');
     }
+
+    peerConnection.ontrack = (ev) => {
+      console.log('Get video call');
+      const anotherVideo: HTMLVideoElement = document.createElement('video');
+      anotherVideo.muted = true;
+      anotherVideo.srcObject = ev.streams[0];
+      anotherVideo.addEventListener('loadedmetadata', () => anotherVideo.play());
+
+      if (anotherVideoContainerRef.current && anotherVideoContainerRef.current.childElementCount === 0) {
+        anotherVideoContainerRef.current.append(anotherVideo);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const myVideo: HTMLVideoElement = document.createElement('video');
+    myVideo.muted = true;
+
+    navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
+      .then((stream) => {
+        localStream = stream;
+        myVideo.srcObject = stream;
+        myVideo.addEventListener('loadedmetadata', () => myVideo.play());
+
+        if (myVideoContainerRef.current && myVideoContainerRef.current.childElementCount === 0) {
+          myVideoContainerRef.current.append(myVideo);
+        }
+      });
   }, []);
 
   const sendToSignalingServer = (message: MessageType) => {
@@ -121,6 +158,15 @@ export default function Home() {
     }
   }
 
+  const startVideoCall = () => {
+    if (peerConnection && localStream) {
+      console.log('Start video call');
+      localStream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, localStream);
+      });
+    }
+  }
+
   return (
     <>
       <Head>
@@ -136,6 +182,13 @@ export default function Home() {
 
         <input type='text' ref={inputMessageRef} />
         <button type='button' onClick={sendMessageToChannel}>Send</button>
+
+        <div>
+          <button type='button' onClick={startVideoCall}>Start Video Call</button>
+        </div>
+
+        <div ref={myVideoContainerRef} style={{ width: '300px', height: '300px', }}></div>
+        <div ref={anotherVideoContainerRef} style={{ width: '300px', height: '300px', }}></div>
       </main>
     </>
   );
