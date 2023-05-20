@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import virtualica.dto.UserDto;
 import virtualica.entity.User;
 import virtualica.repository.UserRepository;
 
@@ -36,6 +37,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User findUserByEmail(String email) {
         return userRepository.findUserByEmail(email).orElse(null);
+    }
+
+    @Override
+    public User dtoToEntity(UserDto userDto) {
+        return User.builder().name(userDto.getName()).email(userDto.getName()).password(userDto.getPassword()).role(userDto.getRole()).build();
     }
 
     @Override
