@@ -3,6 +3,8 @@ package virtualica.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.sql.Timestamp;
+
 @Entity
 @Table(name = "rooms")
 @Getter
@@ -14,7 +16,9 @@ import lombok.*;
 public class Room {
     @Id
     private String id;
-    private RoomStatus roomStatus;
+    private String roomName;
+    private Boolean roomStatus;
     @ManyToOne @JoinColumn(name = "owner")
     private User owner;
+    private Timestamp createdAt;
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import virtualica.dto.UserDto;
+import virtualica.entity.User;
 import virtualica.service.UserService;
 import virtualica.util.ApiResponse;
 
@@ -18,10 +19,11 @@ import virtualica.util.ApiResponse;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping(path = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> userSignup(@RequestBody UserDto userDto) {
-        userService.saveUser(userService.dtoToEntity(userDto));
+        User user = userService.dtoToEntity(userDto);
+        userService.saveUser(user);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.jsonStructureNoData(HttpStatus.CREATED));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.jsonNoData(HttpStatus.CREATED));
     }
 }

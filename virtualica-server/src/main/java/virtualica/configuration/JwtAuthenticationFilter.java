@@ -73,7 +73,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setStatus(HttpStatus.OK.value());
         new ObjectMapper().writeValue(
                 response.getOutputStream(),
-                ApiResponse.jsonStructureWithData(HttpStatus.OK, tokens)
+                ApiResponse.jsonWithData(HttpStatus.OK, tokens)
         );
     }
 
@@ -84,7 +84,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         new ObjectMapper().writeValue(
                 response.getOutputStream(),
-                ApiResponse.jsonStructureNoData(HttpStatus.UNAUTHORIZED)
+                ApiResponse.jsonNoData(HttpStatus.UNAUTHORIZED)
         );
     }
 }
