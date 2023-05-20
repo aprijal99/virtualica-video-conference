@@ -45,4 +45,20 @@ public class RoomController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.jsonWithData(HttpStatus.CREATED, Map.of("roomId", roomId)));
     }
+
+    @PutMapping(path = "/{roomId}/change-status", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> changeRoomStatus(@PathVariable(name = "roomId") String roomId) {
+        roomService.updateRoomStatus(roomId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.jsonNoData(HttpStatus.OK));
+    }
+
+    @DeleteMapping(path = "/{roomId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> deleteRoom(@PathVariable(name = "roomId") String roomId) {
+        roomService.deleteRoom(roomId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.jsonNoData(HttpStatus.OK));
+    }
 }

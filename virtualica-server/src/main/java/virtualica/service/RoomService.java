@@ -10,7 +10,9 @@ import virtualica.entity.User;
 @Transactional
 public interface RoomService {
     String saveRoom(Room room);
-    Room findRoomById(String id);
+    Room findRoomById(String roomId);
+    void updateRoomStatus(String roomId);
+    void deleteRoom(String roomId);
     Room dtoToEntity(RoomDto roomDto, User owner);
     RoomDto entityToDto(Room room);
 }

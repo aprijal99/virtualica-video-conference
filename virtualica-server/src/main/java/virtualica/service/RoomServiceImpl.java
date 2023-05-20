@@ -27,8 +27,20 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Room findRoomById(String id) {
-        return roomRepository.findById(id).orElse(null);
+    public Room findRoomById(String roomId) {
+        return roomRepository.findById(roomId).orElse(null);
+    }
+
+    @Override
+    public void updateRoomStatus(String roomId) {
+        Room room = this.findRoomById(roomId);
+        room.setRoomStatus(!room.getRoomStatus());
+        roomRepository.save(room);
+    }
+
+    @Override
+    public void deleteRoom(String roomId) {
+        roomRepository.deleteById(roomId);
     }
 
     @Override
