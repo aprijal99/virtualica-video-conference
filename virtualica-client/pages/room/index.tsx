@@ -1,3 +1,5 @@
+import {Button} from '@mui/material';
+
 const conn: WebSocket = new WebSocket('ws://localhost:7181/socket');
 
 const Room = () => {
@@ -12,7 +14,7 @@ const Room = () => {
   return (
     <>
       <div>Room</div>
-      <button type='button' onClick={handleSendButton}>Send signal</button>
+      <Button variant='contained'>Send Signal</Button>
     </>
   );
 }
