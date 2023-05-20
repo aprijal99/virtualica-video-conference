@@ -33,6 +33,22 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public Room dtoToEntity(RoomDto roomDto, User owner) {
-        return Room.builder().roomName(roomDto.getRoomName()).owner(owner).createdAt(new Timestamp(roomDto.getCreatedAt())).build();
+        return Room.builder()
+                .roomName(roomDto.getRoomName())
+                .owner(owner)
+                .createdAt(new Timestamp(roomDto.getCreatedAt()))
+                .build();
+    }
+
+    @Override
+    public RoomDto entityToDto(Room room) {
+        return RoomDto.builder()
+                .roomId(room.getId())
+                .roomName(room.getRoomName())
+                .roomStatus(room.getRoomStatus())
+                .ownerName(room.getOwner().getName())
+                .ownerEmail(room.getOwner().getEmail())
+                .createdAt(room.getCreatedAt().getTime())
+                .build();
     }
 }

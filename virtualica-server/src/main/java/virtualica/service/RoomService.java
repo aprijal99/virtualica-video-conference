@@ -12,4 +12,5 @@ public interface RoomService {
     String saveRoom(Room room);
     Room findRoomById(String id);
     Room dtoToEntity(RoomDto roomDto, User owner);
+    RoomDto entityToDto(Room room);
 }

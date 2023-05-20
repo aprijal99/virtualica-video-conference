@@ -8,8 +8,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoomDto {
+    private String roomId;
     private String roomName;
-    private String roomUrl;
     private Boolean roomStatus;
     private String ownerName;
     private String ownerEmail;

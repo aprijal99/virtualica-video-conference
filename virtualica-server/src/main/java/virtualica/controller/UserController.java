@@ -24,6 +24,7 @@ public class UserController {
         User user = userService.dtoToEntity(userDto);
         userService.saveUser(user);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.jsonNoData(HttpStatus.CREATED));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.jsonNoData(HttpStatus.CREATED));
     }
 }

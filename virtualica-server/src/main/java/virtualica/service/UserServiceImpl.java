@@ -41,7 +41,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User dtoToEntity(UserDto userDto) {
-        return User.builder().name(userDto.getName()).email(userDto.getName()).password(userDto.getPassword()).role(userDto.getRole()).build();
+        return User.builder()
+                .name(userDto.getName())
+                .email(userDto.getName())
+                .password(userDto.getPassword())
+                .role(userDto.getRole())
+                .build();
     }
 
     @Override
