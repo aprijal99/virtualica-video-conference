@@ -32,10 +32,12 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public void updateRoomStatus(String roomId) {
+    public boolean updateRoomStatus(String roomId) {
         Room room = this.findRoomById(roomId);
         room.setRoomStatus(!room.getRoomStatus());
         roomRepository.save(room);
+
+        return room.getRoomStatus();
     }
 
     @Override

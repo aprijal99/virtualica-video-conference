@@ -9,6 +9,7 @@ import virtualica.dto.RoomDto;
 import virtualica.entity.Room;
 import virtualica.entity.User;
 import virtualica.service.RoomService;
+import virtualica.service.SessionService;
 import virtualica.service.UserService;
 import virtualica.util.ApiResponse;
 
@@ -20,6 +21,7 @@ import java.util.Map;
 public class RoomController {
     private final UserService userService;
     private final RoomService roomService;
+    private final SessionService sessionService;
 
     @GetMapping(path = "/{roomId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getRoomById(@PathVariable(name = "roomId") String roomId) {
@@ -48,7 +50,13 @@ public class RoomController {
 
     @PutMapping(path = "/{roomId}/change-status", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changeRoomStatus(@PathVariable(name = "roomId") String roomId) {
-        roomService.updateRoomStatus(roomId);
+        boolean roomStatus = roomService.updateRoomStatus(roomId);
+
+        if (roomStatus) {
+            sessionService.addRoom(roomId);
+        } else {
+            sessionService.deleteRoom(roomId);
+        }
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.jsonNoData(HttpStatus.OK));

@@ -11,7 +11,7 @@ import virtualica.entity.User;
 public interface RoomService {
     String saveRoom(Room room);
     Room findRoomById(String roomId);
-    void updateRoomStatus(String roomId);
+    boolean updateRoomStatus(String roomId);
     void deleteRoom(String roomId);
     Room dtoToEntity(RoomDto roomDto, User owner);
     RoomDto entityToDto(Room room);
