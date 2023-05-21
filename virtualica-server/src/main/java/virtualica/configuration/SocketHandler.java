@@ -27,14 +27,4 @@ public class SocketHandler extends TextWebSocketHandler {
             }
         }
     }
-
-    @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
-        sessions.add(session);
-    }
-
-    @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        sessions.remove(session);
-    }
 }
