@@ -23,11 +23,11 @@ public class SocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession webSocketSession, TextMessage textMessage) throws Exception {
         Map<String, Object> map = new ObjectMapper().readValue(textMessage.getPayload(), new TypeReference<>(){});
-        String event = (String) map.get("event");
+        String type = (String) map.get("type");
         String roomId = (String) map.get("roomId");
         String senderEmail = (String) map.get("userEmail");
 
-        switch (event) {
+        switch (type) {
             case "JOIN" -> sessionService.addSessionToRoom(webSocketSession, roomId, senderEmail);
             case "REQUEST" -> sessionService.sendRequestMessage(roomId, senderEmail, textMessage);
             case "OFFER", "CANDIDATE", "ANSWER" -> {
