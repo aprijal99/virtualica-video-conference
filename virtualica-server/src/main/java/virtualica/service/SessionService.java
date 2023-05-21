@@ -8,4 +8,6 @@ public interface SessionService {
     void addRoom(String roomId);
     void addSessionToRoom(WebSocketSession webSocketSession, String roomId, String userEmail);
     Map<String, WebSocketSession> getRoomSessions(String roomId);
+    void deleteSession(String roomId, String userEmail);
+    void deleteRoom(String roomId);
 }
