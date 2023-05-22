@@ -5,3 +5,7 @@ video {
   transform: scaleX(-1);
   -webkit-transform: scaleX(-1);
 }
+
+.prevent-highlight-on-click {
+  -webkit-tap-highlight-color: transparent;
+}
