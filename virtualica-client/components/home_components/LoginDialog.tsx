@@ -1,7 +1,8 @@
 import {
-  Avatar, Backdrop,
+  AlertColor,
+  Avatar,
   Box,
-  Button, Checkbox, CircularProgress,
+  Button, Checkbox,
   Dialog,
   DialogContent,
   DialogTitle, FormControlLabel,
@@ -12,6 +13,8 @@ import {
 } from '@mui/material';
 import {Close, LockOutlined} from '@mui/icons-material';
 import {useState} from 'react';
+import CustomBackdrop from '@/components/feedback_components/CustomBackdrop';
+import CustomSnackbar from '@/components/feedback_components/CustomSnackbar';
 
 type ApiType<T> = {
   code: number,
@@ -28,6 +31,8 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [backdrop, setBackdrop] = useState<boolean>(false);
+  const [alert, setAlert] = useState<boolean>(false);
+  const [alertMessage, setAlertMessage] = useState<{ severity: AlertColor, message: string, }>({ severity: 'success', message: '', });
 
   const handleLogin = async () => {
     if (email !== '' && password !== '') {
@@ -45,18 +50,22 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
 
       const apiResult: ApiType<LoginResult> = await fetchResult.json();
       if (apiResult.code === 200) {
-        console.log('Login succeed');
+        setAlertMessage({ severity: 'success', message: 'Login succeed, redirect to dashboard', });
         window.location.href = ('http://localhost:3000/room');
       } else {
-        console.log('Unsuccessful login');
+        setAlertMessage({ severity: 'error', message: 'Email or password is wrong', });
       }
 
       setBackdrop(false);
+    } else {
+      setAlertMessage({ severity: 'warning', message: 'Email or password can not be empty', });
     }
+
+    setAlert(true);
   }
 
   return (
-    <Dialog open={openLoginDialog} onClose={handleCloseLoginDialog} maxWidth='xs' fullScreen={useMediaQuery('(max-width: 600px)')}>
+    <Dialog open={openLoginDialog} onClose={handleCloseLoginDialog} maxWidth='xs' fullScreen={useMediaQuery('(max-width: 599px)')}>
       <Box sx={{ maxWidth: '400px', mx: 'auto' }}>
         <DialogTitle sx={{ p: '24px 24px 0', }}>
           <Avatar sx={{ mx: 'auto', mb: 1.5, bgcolor: '#199bf1', }}>
@@ -84,9 +93,8 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
       <IconButton onClick={handleCloseLoginDialog} sx={{ position: 'absolute', right: '10px', top: '10px', }}>
         <Close fontSize='small' />
       </IconButton>
-      <Backdrop open={backdrop} sx={{ zIndex: 10000, }}>
-        <CircularProgress />
-      </Backdrop>
+      <CustomBackdrop backdropLoading={backdrop} />
+      <CustomSnackbar openAlert={alert} closeAlert={() => setAlert(false)} alertMessage={alertMessage.message} alertSeverity={alertMessage.severity} />
     </Dialog>
   );
 }
