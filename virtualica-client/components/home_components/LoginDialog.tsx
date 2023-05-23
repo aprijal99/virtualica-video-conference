@@ -34,6 +34,7 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
       const encodedFormBody = Object.keys(formBody).map((key: string) => encodeURIComponent(key) + '=' + encodeURIComponent(formBody[key])).join('&');
 
       const fetchResult = await fetch('http://localhost:7181/login', {
+        credentials: 'include',
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', },
         body: encodedFormBody,
@@ -42,6 +43,8 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
       const apiResult: ApiType<LoginResult> = await fetchResult.json();
       if (apiResult.code === 200) {
         window.location.href = ('http://localhost:7181/room');
+      } else {
+        console.log('Unsuccessful login');
       }
     }
   }
