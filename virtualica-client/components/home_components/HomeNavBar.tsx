@@ -1,14 +1,17 @@
 import {AppBar, Box, Button, Menu, Toolbar, Typography} from '@mui/material';
 import {GitHub, HelpOutline, MenuOutlined} from '@mui/icons-material';
 import {grey} from '@mui/material/colors';
-import React from 'react';
+import React, {useState} from 'react';
+import LoginDialog from '@/components/home_components/LoginDialog';
 
 const HomeNavBar = () => {
   const menu = ['About', 'GitHub'];
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement | undefined>(null);
-  const open = Boolean(anchorEl);
+  const openMenu = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
+
+  const [openLoginDialog, setOpenLoginDialog] = useState<boolean>(false);
 
   return (
     <AppBar component='nav' position='static' sx={{ backgroundImage: 'none', boxShadow: 'none', }}>
@@ -33,11 +36,12 @@ const HomeNavBar = () => {
 
         {/* LOGIN BUTTON */}
         <Button
-          variant='outlined' size='small'
+          variant='outlined' size='small' onClick={() => setOpenLoginDialog(true)}
           sx={{ textTransform: 'none', color: 'white', borderColor: 'white', ':hover': { borderColor: 'white', bgcolor: 'initial', }, }}
         >
           Login
         </Button>
+        <LoginDialog openLoginDialog={openLoginDialog} handleCloseLoginDialog={() => setOpenLoginDialog(false)} />
 
         {/* MOBILE MENU BUTTON*/}
         <Box display='flex' onClick={handleClick}>
@@ -49,7 +53,7 @@ const HomeNavBar = () => {
 
         {/* MOBILE MENU */}
         <Menu
-          open={open} anchorEl={anchorEl} onClose={handleClose}
+          open={openMenu} anchorEl={anchorEl} onClose={handleClose}
           sx={{ top: '15px', left: '-2px', '.MuiList-root': { px: 1, }, }}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'right', }}
           transformOrigin={{ vertical: 'top', horizontal: 'right', }}
