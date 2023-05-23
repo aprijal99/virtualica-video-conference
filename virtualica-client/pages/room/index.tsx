@@ -1,6 +1,6 @@
 import {Box} from '@mui/material';
-import ButtonNav from '@/components/ButtonNav';
-import VideoContainer from '@/components/VideoContainer';
+import RoomNavBar from '@/components/room_components/RoomNavBar';
+import VideoContainer from '@/components/room_components/VideoContainer';
 
 // const socket: WebSocket = new WebSocket('ws://localhost:7181/socket');
 
@@ -17,7 +17,7 @@ const Room = () => {
       <VideoContainer />
 
       {/* NAVIGATION */}
-      <ButtonNav />
+      <RoomNavBar />
     </Box>
   );
 }

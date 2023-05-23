@@ -9,7 +9,7 @@ import {
   VideocamOutlined
 } from '@mui/icons-material';
 
-const ButtonNav = () => {
+const RoomNavBar = () => {
   return (
     <Box
       display='flex' justifyContent='center' alignItems='center' columnGap='20px'
@@ -56,4 +56,4 @@ const ButtonNav = () => {
   );
 }
 
-export default ButtonNav;
+export default RoomNavBar;
