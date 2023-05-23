@@ -1,7 +1,7 @@
 import {
-  Avatar,
+  Avatar, Backdrop,
   Box,
-  Button, Checkbox,
+  Button, Checkbox, CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle, FormControlLabel,
@@ -27,9 +27,12 @@ type LoginResult = {
 const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDialog: boolean, handleCloseLoginDialog: () => void, }) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [backdrop, setBackdrop] = useState<boolean>(false);
 
   const handleLogin = async () => {
     if (email !== '' && password !== '') {
+      setBackdrop(true);
+
       const formBody: { [n: string]: string } = { email: email, password: password, }
       const encodedFormBody = Object.keys(formBody).map((key: string) => encodeURIComponent(key) + '=' + encodeURIComponent(formBody[key])).join('&');
 
@@ -42,10 +45,13 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
 
       const apiResult: ApiType<LoginResult> = await fetchResult.json();
       if (apiResult.code === 200) {
-        window.location.href = ('http://localhost:7181/room');
+        console.log('Login succeed');
+        window.location.href = ('http://localhost:3000/room');
       } else {
         console.log('Unsuccessful login');
       }
+
+      setBackdrop(false);
     }
   }
 
@@ -78,6 +84,9 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
       <IconButton onClick={handleCloseLoginDialog} sx={{ position: 'absolute', right: '10px', top: '10px', }}>
         <Close fontSize='small' />
       </IconButton>
+      <Backdrop open={backdrop} sx={{ zIndex: 10000, }}>
+        <CircularProgress />
+      </Backdrop>
     </Dialog>
   );
 }
