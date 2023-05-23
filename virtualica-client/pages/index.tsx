@@ -1,189 +1,159 @@
-import Head from 'next/head'
-import {createRef, useEffect} from 'react';
+import {AppBar, Box, Button, IconButton, Link, Menu, Toolbar, Typography} from '@mui/material';
+import {GitHub, HelpOutline, KeyboardArrowLeft, KeyboardArrowRight, LinkedIn, MenuOutlined} from '@mui/icons-material';
+import React, {useState} from 'react';
+import {grey} from '@mui/material/colors';
 
-type MessageType = {
-  event: string,
-  data?: RTCSessionDescription | RTCIceCandidate,
-}
-
-const OFFER: string = 'OFFER';
-const ANSWER: string = 'ANSWER';
-const CANDIDATE: string = 'CANDIDATE';
-const JOINT: string = 'JOIN';
-
-const conn: WebSocket = new WebSocket('ws://localhost:7181/socket');
-// const conn: WebSocket = new WebSocket('wss://virtualica-signaling-server.onrender.com/socket');
-
-export default function Home() {
-  conn.onopen = () => console.log('Connected to the signaling server');
-
-  conn.onmessage = (ev) => {
-    const message: MessageType = JSON.parse(ev.data);
-
-    switch (message.event) {
-      case JOINT:
-        console.log('Start joining');
-        handlePeerConnection();
-        break;
-      case OFFER:
-        console.log('Receiving an offer');
-        handleOffer(message.data as RTCSessionDescription);
-        break;
-      case ANSWER:
-        console.log('Receiving an answer');
-        handleAnswer(message.data as RTCSessionDescription);
-        break;
-      case CANDIDATE:
-        console.log('Receiving an ICE candidate');
-        handleIceCandidate(message.data as RTCIceCandidate);
-        break;
-      default:
-        break;
-    }
-  }
-
-  let peerConnection: RTCPeerConnection;
-  let localStream: MediaStream;
-
-  const localVideoContainer = createRef<HTMLDivElement>();
-  const remoteVideoContainer = createRef<HTMLDivElement>();
-  let localVideo: HTMLVideoElement;
-  let remoteVideo: HTMLVideoElement;
-
-  useEffect(() => {
-    localVideo = document.createElement('video');
-    remoteVideo = document.createElement('video');
-  }, []);
-
-  const sendToSignalingServer = (message: MessageType) => {
-    conn.send(JSON.stringify(message));
-  }
-
-  const startVideoCall = () => {
-    console.log('Start video call');
-    peerConnection = new RTCPeerConnection({
-      iceServers: [
-        {'urls': 'stun:stun.stunprotocol.org:3478'},
-        {'urls': 'stun:stun.l.google.com:19302'},
-      ],
-    });
-
-    if (peerConnection) {
-      peerConnection.ontrack = (ev) => {
-        console.log('Set stream to remote video element');
-        remoteVideo.srcObject = ev.streams[0];
-        remoteVideo.addEventListener('loadedmetadata', () => remoteVideo.play());
-        if (remoteVideoContainer.current && remoteVideoContainer.current.childElementCount === 0) {
-          remoteVideoContainer.current.append(remoteVideo);
-        }
-      }
-    }
-
-    sendToSignalingServer({ event: 'JOIN', });
-  }
-
-  const handlePeerConnection = () => {
-    peerConnection = new RTCPeerConnection({
-      iceServers: [
-        {'urls': 'stun:stun.stunprotocol.org:3478'},
-        {'urls': 'stun:stun.l.google.com:19302'},
-      ],
-    });
-
-    if (peerConnection) {
-      peerConnection.onicecandidate = (ev) => {
-        if (ev.candidate) {
-          sendToSignalingServer({ event: CANDIDATE, data: ev.candidate, });
-          console.log('Send ICE candidate to signaling server');
-        }
-      }
-
-      peerConnection.ontrack = (ev) => {
-        console.log('Set stream to remote video element');
-        remoteVideo.srcObject = ev.streams[0];
-        remoteVideo.addEventListener('loadedmetadata', () => remoteVideo.play());
-        if (remoteVideoContainer.current && remoteVideoContainer.current.childElementCount === 0) {
-          remoteVideoContainer.current.append(remoteVideo);
-        }
-      }
-
-      navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
-        .then((mediaStream) => {
-          localVideo.srcObject = mediaStream;
-          localVideo.addEventListener('loadedmetadata', () => localVideo.play());
-          if (localVideoContainer.current && localVideoContainer.current.childElementCount === 0) {
-            localVideoContainer.current.append(localVideo);
-          }
-
-          localStream = mediaStream;
-          localStream.getTracks().forEach((mediaStreamTrack) => {
-            peerConnection.addTrack(mediaStreamTrack, localStream);
-          });
-        });
-
-      peerConnection.onnegotiationneeded = (() => {
-        peerConnection.createOffer()
-          .then((offer) => peerConnection.setLocalDescription(offer))
-          .then(() => sendToSignalingServer({ event: OFFER, data: peerConnection.localDescription, }))
-          .then(() => console.log('Set local description and send an OFFER to signaling server'));
-      });
-    }
-  }
-
-  const handleIceCandidate = (candidate: RTCIceCandidate) => {
-    if (peerConnection) {
-      peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
-        .then(() => console.log('Add received ICE candidate'));
-    }
-  }
-
-  const handleOffer = (offer: RTCSessionDescription) => {
-    if (peerConnection) {
-      peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
-        .then(() => {
-          console.log('Set remote description');
-          return navigator.mediaDevices.getUserMedia({ audio: true, video: true, });
-        })
-        .then((mediaStream) => {
-          localVideo.srcObject = mediaStream;
-          localVideo.addEventListener('loadedmetadata', () => localVideo.play());
-          if (localVideoContainer.current && localVideoContainer.current.childElementCount === 0) {
-            localVideoContainer.current.append(localVideo);
-          }
-
-          localStream = mediaStream;
-          localStream.getTracks().forEach((mediaStreamTrack) => {
-            peerConnection.addTrack(mediaStreamTrack, localStream);
-          });
-        })
-        .then(() => peerConnection.createAnswer())
-        .then((answer) => peerConnection.setLocalDescription(answer))
-        .then(() => sendToSignalingServer({ event: ANSWER, data: peerConnection.localDescription, }))
-        .then(() => console.log('Set local description and send an ANSWER to signaling server'));
-    }
-  }
-
-  const handleAnswer = (answer: RTCSessionDescription) => {
-    if (peerConnection) {
-      peerConnection.setRemoteDescription(answer)
-        .then(() => console.log('Set remote description'));
-    }
-  }
+const Index = () => {
+  const menu = ['About', 'GitHub'];
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement | undefined>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
 
   return (
-    <>
-      <Head>
-        <title>Create Next App</title>
-        <meta name="description" content="Generated by create next app" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <main>
-        <button type='button' onClick={startVideoCall}>Start Video Call</button>
+    <Box sx={{ maxWidth: '1000px', m: '0 auto', }}>
+      <AppBar component='nav' position='static' sx={{ backgroundImage: 'none', boxShadow: 'none', }}>
+        <Toolbar sx={{ minHeight: '80px', padding: '0 24px', '@media (min-width: 600px)': { minHeight: '80px', }, }}>
+          <Box flexGrow='1' display='flex' alignItems='center'>
+            <img src='/virtualica.png' alt='logo' style={{ width: '30px', marginRight: '10px', }} />
+            <Typography variant='h6' component='div' sx={{ fontWeight: 'bold', }} >Virtualica</Typography>
+          </Box>
+          <Box display='none' columnGap='10px' sx={{ mr: 1.5, '@media (min-width: 600px)': { display: 'flex', }, }}>
+            {menu.map((m, idx) => (
+              <Button
+                key={idx} disableRipple startIcon={m === 'About' ? <HelpOutline /> : <GitHub />}
+                sx={{ color: 'white', textTransform: 'none', ':hover': { bgcolor: 'initial', }, }}
+              >
+                {m}
+              </Button>
+            ))}
+          </Box>
+          <Button
+            variant='outlined' size='small'
+            sx={{
+              textTransform: 'none', color: 'white', borderColor: 'white',
+              ':hover': { borderColor: 'white', bgcolor: 'initial', },
+            }}
+          >
+            Login
+          </Button>
+          <Box display='flex' onClick={handleClick}>
+            <MenuOutlined
+              className='prevent-highlight-on-click'
+              sx={{ ml: 1.5, cursor: 'pointer', '@media (min-width: 600px)': { display: 'none', }, }}
+            />
+          </Box>
+          <Menu
+            open={open} anchorEl={anchorEl} onClose={handleClose}
+            sx={{ top: '15px', left: '-2px', '.MuiList-root': { px: 1, }, }}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right', }}
+            transformOrigin={{ vertical: 'top', horizontal: 'right', }}
+          >
+            {menu.map((m, idx) => (
+              <Box
+                key={idx} className='prevent-highlight-on-click' onClick={handleClose}
+                display='flex' justifyContent='start' alignItems='center' columnGap='10px'
+                sx={{
+                  minHeight: 'initial', fontSize: '.9rem', fontWeight: 'medium', px: 1, py: '6px', cursor: 'pointer',
+                  borderRadius: '4px', ':hover': { bgcolor: grey['800'], },
+                }}
+              >
+                {m === 'About' ? <HelpOutline fontSize='small' /> : <GitHub fontSize='small' />}
+                {m}
+              </Box>
+            ))}
+          </Menu>
+        </Toolbar>
+      </AppBar>
 
-        <div ref={localVideoContainer} style={{ width: '300px', height: '300px', }}></div>
-        <div ref={remoteVideoContainer} style={{ width: '300px', height: '300px', }}></div>
-      </main>
-    </>
+      <Box
+        sx={{
+          px: '24px', my: 3,
+          '@media (min-width: 460px)': { mt: 5, },
+          '@media (min-width: 530px)': { mt: 7, },
+          '@media (min-width: 600px)': { mt: 9, },
+        }}
+      >
+        <Box sx={{ maxWidth: '600px', mx: 'auto', }}>
+          <Typography
+            align='center' gutterBottom={true}
+            sx={{
+              fontSize: '28px', lineHeight: '2.3rem', fontWeight: '700',
+              '@media (min-width: 460px)': { fontSize: '35px', lineHeight: '3rem', },
+              '@media (min-width: 530px)': { fontSize: '42px', lineHeight: '3.4rem', },
+              '@media (min-width: 600px)': { fontSize: '48px', lineHeight: '3.8rem', },
+            }}
+          >
+            One platform to <span style={{ color: '#199bf1', }}>connect</span>, <span style={{ color: '#199bf1', }}>create</span>,
+            and <span style={{ color: '#199bf1', }}>innovate</span>
+          </Typography>
+          <Typography
+            gutterBottom={true} align='center'
+            sx={{ mt: 3, color: grey['400'], '@media (min-width: 600px)': { fontSize: '18px', }, }}
+          >
+            Bring teams together, reimagine workspaces, engage new audiences, and delight your customers -
+            all on the <span style={{ color: '#199bf1', }}>Virtualica</span> platform you know and love
+          </Typography>
+        </Box>
+
+        <Carousel />
+
+        <Typography
+          align='center' gutterBottom={true}
+          sx={{ mt: 10, fontWeight: '300', }}
+        >
+          Created by <Link underline='none' target='_blank' href='https://www.aprijal-ghiyas.tech'>
+          Aprijal Ghiyas Setiawan</Link>
+        </Typography>
+        <Box display='flex' justifyContent='center' columnGap='10px'>
+          <Link target='_blank' href='https://github.com/aprijal99'><GitHub sx={{ color: 'white', }} /></Link>
+          <Link target='_blank' href='https://www.linkedin.com/in/aprijalghiyas/'><LinkedIn sx={{ color: 'white', }} /></Link>
+        </Box>
+      </Box>
+    </Box>
   );
 }
+
+const Carousel = () => {
+  const text = [
+    ['online-meeting.png', 'Connect with Virtualica', 'Enjoy video calls with friends and families or work meetings without any time limitation'],
+    ['share-link.png', 'Get a link to share', 'Easy to get and share a link you can send to people you want to meet with'],
+    ['schedule.png', 'Plan ahead', 'Create schedule meetings and send invites to participants'],
+    ['secure.png', 'The meeting is safe', 'No one can join a meeting unless invited or admitted by the host'],
+  ];
+  const [textIdx, setTextIdx] = useState<number>(0);
+
+  return (
+    <Box
+      display='flex'
+      sx={{
+        mt: 5, maxWidth: '450px', mx: 'auto',
+        '@media (min-width: 460px)': { mt: 6.5, },
+        '@media (min-width: 530px)': { mt: 8, },
+        '@media (min-width: 600px)': { mt: 10, },
+      }}
+    >
+      <Box display='flex' alignItems='center'>
+        <IconButton disabled={textIdx === 0} onClick={() => setTextIdx(prevState => prevState - 1)}>
+          <KeyboardArrowLeft />
+        </IconButton>
+      </Box>
+      <Box sx={{ mx: 1, }}>
+        <img src={`/${text[textIdx][0]}`} alt='online meeting' style={{ width: '100%', }} />
+        <Typography align='center' gutterBottom sx={{ fontSize: '20px',  mt: 2, '@media (min-width: 460px)': { fontSize: '24px', }, }}>
+          {text[textIdx][1]}
+        </Typography>
+        <Typography align='center' sx={{ fontWeight: '300', fontSize: '14px', }}>
+          {text[textIdx][2]}
+        </Typography>
+      </Box>
+      <Box display='flex' alignItems='center'>
+        <IconButton disabled={textIdx === 3} onClick={() => setTextIdx(prevState => prevState + 1)}>
+          <KeyboardArrowRight />
+        </IconButton>
+      </Box>
+    </Box>
+  );
+}
+
+export default Index;

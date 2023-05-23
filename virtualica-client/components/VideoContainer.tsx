@@ -2,12 +2,13 @@ import {Avatar, Box, Typography} from '@mui/material';
 import {grey} from '@mui/material/colors';
 import {MicOffOutlined} from '@mui/icons-material';
 import nameToColor from '@/functions/nameToColor';
+import {createRef, useEffect, useState} from 'react';
 
 const Video = () => {
   return (
     <Box
-      display='flex' alignItems='center' justifyContent='center'
-      sx={{ bgcolor: grey['800'], borderRadius: '10px', position: 'relative', minHeight: '150px', minWidth: 'calc(50% - 5px)', }}
+      display='flex' alignItems='center' justifyContent='center' flexGrow='1'
+      sx={{ bgcolor: grey['800'], borderRadius: '10px', position: 'relative', minHeight: '150px', minWidth: '266px', }}
     >
       <Avatar
         sx={{ height: '60px', width: '60px', bgcolor: nameToColor('Aprijal Ghiyas Setiawan'), }}
@@ -29,15 +30,29 @@ const Video = () => {
 }
 
 const VideoContainer = () => {
+  const [videos, setVideos] = useState<string[]>(['']);
+  const videosWrapperRef = createRef<HTMLDivElement>();
+
+  useEffect(() => {
+    if (videosWrapperRef.current) {
+      const videoMinHeight = 150;
+      const videoMinWidth = 266;
+
+      const wrapperHeight: number = videosWrapperRef.current.offsetHeight;
+      const wrapperWidth: number = videosWrapperRef.current.offsetWidth;
+
+      const rowNum = Math.floor(wrapperHeight / videoMinHeight);
+      const colNum = Math.floor(wrapperWidth / videoMinWidth);
+
+
+    }
+  }, [videos]);
+
   return (
-    <Box display='flex' flexDirection='column' flexGrow='1' sx={{ mt: 2, }}>
+    <Box display='flex' flexDirection='column' flexGrow='1' sx={{ mt: 2, }} onClick={() => setVideos(prevState => [...prevState, ''])}>
       <Typography sx={{ mb: 2, '@media (min-width: 600px)': { display: 'none', }, }}>Team Meeting</Typography>
-      <Box display='flex' flexGrow='1' flexWrap='wrap' gap='10px' justifyContent='center' sx={{ overflow: 'hidden', }}>
-        <Video />
-        <Video />
-        <Video />
-        <Video />
-        <Video />
+      <Box ref={videosWrapperRef} display='flex' flexGrow='1' flexDirection='column'  sx={{ overflow: 'hidden', }}>
+
       </Box>
     </Box>
   );
