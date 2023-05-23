@@ -8,8 +8,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Component;
 import virtualica.util.ApiResponse;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Date;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -69,8 +72,18 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 "refresh_token", refreshToken
         );
 
+        ResponseCookie responseCookie = ResponseCookie.from("access_token", accessToken)
+                .httpOnly(true)
+                .secure(false) // 'true' in https mode
+                .path("/")
+                .sameSite("lax")
+                .maxAge(Duration.ofMinutes(5))
+                .build();
+
+
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.OK.value());
+        response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
         new ObjectMapper().writeValue(
                 response.getOutputStream(),
                 ApiResponse.jsonWithData(HttpStatus.OK, tokens)
