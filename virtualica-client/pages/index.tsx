@@ -4,7 +4,7 @@ import Carousel from '@/components/home_components/Carousel';
 import Banner from '@/components/home_components/Banner';
 import HomeNavBar from '@/components/home_components/HomeNavBar';
 
-const Index = () => {
+const Home = () => {
   return (
     <Box sx={{ maxWidth: '1000px', m: '0 auto', }}>
       {/* NAVBAR */}
