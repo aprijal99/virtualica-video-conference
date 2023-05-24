@@ -51,7 +51,7 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
       const apiResult: ApiType<LoginResult> = await fetchResult.json();
       if (apiResult.code === 200) {
         setAlertMessage({ severity: 'success', message: 'Login succeed, redirect to dashboard', });
-        window.location.href = ('http://localhost:3000/room');
+        window.location.href = ('http://localhost:3000/dashboard');
       } else {
         setAlertMessage({ severity: 'error', message: 'Email or password is wrong', });
       }

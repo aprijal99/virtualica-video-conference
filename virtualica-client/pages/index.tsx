@@ -41,4 +41,4 @@ const Home = () => {
 
 
 
-export default Index;
+export default Home;

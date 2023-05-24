@@ -19,7 +19,7 @@ const HomeNavBar = () => {
         {/* TITLE */}
         <Box flexGrow='1' display='flex' alignItems='center'>
           <img src='/virtualica.png' alt='logo' style={{ width: '30px', marginRight: '10px', }} />
-          <Typography variant='h6' component='div' sx={{ fontWeight: 'bold', }} >Virtualica</Typography>
+          <Typography variant='h6' component='div' sx={{ fontWeight: 'bold', }}>Virtualica</Typography>
         </Box>
 
         {/* MENU */}
