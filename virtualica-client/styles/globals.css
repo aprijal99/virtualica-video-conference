@@ -13,3 +13,28 @@ video {
 .hover-blue:hover {
   color: #2196f3;
 }
+
+#room-list::after {
+  content: "";
+  position: absolute;
+  width: 210px;
+  height: 210px;
+  background: rgb(21, 101, 192);
+  border-radius: 50%;
+  z-index: 1;
+  top: -85px;
+  right: -75px;
+}
+
+#room-list::before {
+  content: "";
+  position: absolute;
+  width: 210px;
+  height: 210px;
+  background: rgb(21, 101, 192);
+  opacity: 0.5;
+  border-radius: 50%;
+  z-index: 1;
+  top: -125px;
+  right: -15px;
+}

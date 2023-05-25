@@ -1,5 +1,4 @@
 import {AppBar, Avatar, Box, Link, Toolbar, Typography} from '@mui/material';
-import React, {useState} from 'react';
 import {
   Home,
   HomeOutlined,
@@ -10,9 +9,8 @@ import {
 } from '@mui/icons-material';
 import {blue, grey} from '@mui/material/colors';
 
-const DashboardNavBar = () => {
+const DashboardNavBar = ({ tabValue, changeTab }: { tabValue: number, changeTab: (n: number) => void, }) => {
   const menu = ['Home', 'Rooms', 'Contacts'];
-  const [tabValue, setTabValue] = useState(0);
 
   return (
     <AppBar component='nav' position='static' sx={{ backgroundImage: 'none', boxShadow: 'none', bgcolor: grey['900'], }}>
@@ -29,7 +27,7 @@ const DashboardNavBar = () => {
             {menu.map((m, idx) => (
               <Box
                 key={idx} className='prevent-highlight-on-click' display='flex' flexDirection='column' alignItems='center'
-                sx={{ cursor: 'pointer', minWidth: '60px', }} onClick={() => setTabValue(idx)}
+                sx={{ cursor: 'pointer', minWidth: '60px', }} onClick={() => changeTab(idx)}
               >
                 {m === menu[0] && (tabValue === idx ? <Home color='primary' /> : <HomeOutlined sx={{ color: grey['400'], }} />)}
                 {m === menu[1] && (tabValue === idx ? <Videocam color='primary' />: <VideocamOutlined sx={{ color: grey['400'], }} />)}
