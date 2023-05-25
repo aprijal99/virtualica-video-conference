@@ -1,6 +1,6 @@
-import {Box, Button, Divider, IconButton, Typography} from '@mui/material';
+import {Box, Button, Typography} from '@mui/material';
 import {blue, grey} from '@mui/material/colors';
-import {VideoCall, VideocamOutlined} from '@mui/icons-material';
+import {VideoCallOutlined, VideocamOutlined} from '@mui/icons-material';
 
 const DashboardRooms = () => {
   return (
@@ -17,7 +17,7 @@ const DashboardRooms = () => {
         >
           <Typography variant='h6' sx={{ fontWeight: '500', zIndex: 5, }}>Room List</Typography>
           <Button
-            variant='contained' size='small' startIcon={<VideoCall />}
+            variant='contained' size='small' startIcon={<VideoCallOutlined />}
             sx={{ zIndex: 5, textTransform: 'none', boxShadow: 'none', ':hover': { boxShadow: 'none', bgcolor: blue['600'], }, }}
           >
             Create

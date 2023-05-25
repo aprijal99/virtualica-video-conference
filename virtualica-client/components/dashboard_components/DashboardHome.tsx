@@ -102,8 +102,8 @@ const DashboardHome = () => {
             ':hover': { '::-webkit-scrollbar-thumb': { visibility: 'visible', }, scrollbarWidth: 'thin', },
           }}
         >
-          {recentMessages.map((msg, idx) => (<>
-            <ListItemButton key={idx} alignItems='flex-start'>
+          {recentMessages.map((msg, idx) => (<Box key={idx}>
+            <ListItemButton alignItems='flex-start'>
               <ListItemAvatar>
                 <Avatar alt={msg[0]} src={msg[1]} />
               </ListItemAvatar>
@@ -125,7 +125,7 @@ const DashboardHome = () => {
               />
             </ListItemButton>
             {idx !== recentMessages.length - 1 && <Divider variant="inset" component="li" />}
-          </>))}
+          </Box>))}
         </List>
       </Box>
     </Box>

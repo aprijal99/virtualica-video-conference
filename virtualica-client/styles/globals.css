@@ -38,3 +38,27 @@ video {
   top: -125px;
   right: -15px;
 }
+
+#contact-list::after {
+  content: "";
+  position: absolute;
+  width: 210px;
+  height: 210px;
+  background: linear-gradient(210.04deg, rgb(163, 173, 176) -50.94%, rgba(144, 202, 249, 0) 83.49%);
+  border-radius: 50%;
+  z-index: 1;
+  top: -30px;
+  right: -120px;
+}
+
+#contact-list::before {
+  content: "";
+  position: absolute;
+  width: 210px;
+  height: 210px;
+  background: linear-gradient(140.9deg, rgb(163, 173, 176) -14.02%, rgba(144, 202, 249, 0) 77.58%);
+  border-radius: 50%;
+  z-index: 1;
+  top: -160px;
+  right: -50px;
+}
