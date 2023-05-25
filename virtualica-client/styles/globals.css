@@ -9,3 +9,7 @@ video {
 .prevent-highlight-on-click {
   -webkit-tap-highlight-color: transparent;
 }
+
+.hover-blue:hover {
+  color: #2196f3;
+}

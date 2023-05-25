@@ -1,7 +1,6 @@
 import {AppBar, Avatar, Box, Link, Toolbar, Typography} from '@mui/material';
 import React, {useState} from 'react';
 import {
-  AccountCircle, AccountCircleOutlined,
   Home,
   HomeOutlined,
   PermContactCalendar,
@@ -9,8 +8,7 @@ import {
   Videocam,
   VideocamOutlined
 } from '@mui/icons-material';
-import {grey} from '@mui/material/colors';
-import nameToColor from '@/functions/nameToColor';
+import {blue, grey} from '@mui/material/colors';
 
 const DashboardNavBar = () => {
   const menu = ['Home', 'Rooms', 'Contacts'];
@@ -36,7 +34,7 @@ const DashboardNavBar = () => {
                 {m === menu[0] && (tabValue === idx ? <Home color='primary' /> : <HomeOutlined sx={{ color: grey['400'], }} />)}
                 {m === menu[1] && (tabValue === idx ? <Videocam color='primary' />: <VideocamOutlined sx={{ color: grey['400'], }} />)}
                 {m === menu[2] && (tabValue === idx ? <PermContactCalendar color='primary' /> : <PermContactCalendarOutlined sx={{ color: grey['400'], }} />)}
-                <Typography sx={{ fontSize: '12px', mt: .5, color: tabValue === idx ? '#199bf1' : grey['400'], }}>{m}</Typography>
+                <Typography sx={{ fontSize: '12px', mt: .5, color: tabValue === idx ? blue['500'] : grey['400'], }}>{m}</Typography>
               </Box>
             ))}
           </Box>
@@ -44,7 +42,7 @@ const DashboardNavBar = () => {
           <Box display='flex' justifyContent='end' flexBasis='33.33%'>
             <Avatar
               className='prevent-highlight-on-click' variant='rounded' children={<Typography sx={{ color: 'white', }}>A</Typography>}
-              sx={{ bgcolor: '#199bf1', width: '30px', height: '30px', borderRadius: '10px', cursor: 'pointer', }}
+              sx={{ bgcolor: blue['500'], width: '30px', height: '30px', borderRadius: '10px', cursor: 'pointer', }}
             />
           </Box>
         </Box>

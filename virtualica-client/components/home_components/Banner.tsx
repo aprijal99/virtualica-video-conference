@@ -1,5 +1,5 @@
 import {Box, Typography} from '@mui/material';
-import {grey} from '@mui/material/colors';
+import {blue, grey} from '@mui/material/colors';
 import React from 'react';
 
 const Banner = () => {
@@ -14,15 +14,15 @@ const Banner = () => {
           '@media (min-width: 600px)': { fontSize: '48px', lineHeight: '3.8rem', },
         }}
       >
-        One platform to <span style={{ color: '#199bf1', }}>connect</span>, <span style={{ color: '#199bf1', }}>create</span>,
-        and <span style={{ color: '#199bf1', }}>innovate</span>
+        One platform to <span style={{ color: blue['500'], }}>connect</span>, <span style={{ color: blue['500'], }}>create</span>,
+        and <span style={{ color: blue['500'], }}>innovate</span>
       </Typography>
       <Typography
         gutterBottom={true} align='center'
         sx={{ mt: 3, color: grey['400'], '@media (min-width: 600px)': { fontSize: '18px', }, }}
       >
         Bring teams together, reimagine workspaces, engage new audiences, and delight your customers -
-        all on the <span style={{ color: '#199bf1', }}>Virtualica</span> platform you know and love
+        all on the <span style={{ color: blue['500'], }}>Virtualica</span> platform you know and love
       </Typography>
     </Box>
   );

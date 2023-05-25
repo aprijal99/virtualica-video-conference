@@ -15,6 +15,7 @@ import {Close, LockOutlined} from '@mui/icons-material';
 import {useState} from 'react';
 import CustomBackdrop from '@/components/feedback_components/CustomBackdrop';
 import CustomSnackbar from '@/components/feedback_components/CustomSnackbar';
+import {blue} from '@mui/material/colors';
 
 type ApiType<T> = {
   code: number,
@@ -68,7 +69,7 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
     <Dialog open={openLoginDialog} onClose={handleCloseLoginDialog} maxWidth='xs' fullScreen={useMediaQuery('(max-width: 599px)')}>
       <Box sx={{ maxWidth: '400px', mx: 'auto' }}>
         <DialogTitle sx={{ p: '24px 24px 0', }}>
-          <Avatar sx={{ mx: 'auto', mb: 1.5, bgcolor: '#199bf1', }}>
+          <Avatar sx={{ mx: 'auto', mb: 1.5, bgcolor: blue['500'], }}>
             <LockOutlined sx={{ color: 'white', }} />
           </Avatar>
           <Typography gutterBottom sx={{ textAlign: 'center', fontWeight: '600', fontSize: '24px', }}>Login</Typography>
