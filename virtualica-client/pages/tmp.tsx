@@ -14,7 +14,7 @@ const JOINT: string = 'JOIN';
 const conn: WebSocket = new WebSocket('ws://localhost:7181/socket');
 // const conn: WebSocket = new WebSocket('wss://virtualica-signaling-server.onrender.com/socket');
 
-export default function Home() {
+export default function Tmp() {
   conn.onopen = () => console.log('Connected to the signaling server');
 
   conn.onmessage = (ev) => {
@@ -124,7 +124,7 @@ export default function Home() {
       peerConnection.onnegotiationneeded = (() => {
         peerConnection.createOffer()
           .then((offer) => peerConnection.setLocalDescription(offer))
-          .then(() => sendToSignalingServer({ event: OFFER, data: peerConnection.localDescription, }))
+          .then(() => sendToSignalingServer({ event: OFFER, data: peerConnection.localDescription as RTCSessionDescription, }))
           .then(() => console.log('Set local description and send an OFFER to signaling server'));
       });
     }
@@ -158,7 +158,7 @@ export default function Home() {
         })
         .then(() => peerConnection.createAnswer())
         .then((answer) => peerConnection.setLocalDescription(answer))
-        .then(() => sendToSignalingServer({ event: ANSWER, data: peerConnection.localDescription, }))
+        .then(() => sendToSignalingServer({ event: ANSWER, data: peerConnection.localDescription as RTCSessionDescription, }))
         .then(() => console.log('Set local description and send an ANSWER to signaling server'));
     }
   }
