@@ -31,11 +31,63 @@ const Video = ({ name }: { name: string, }) => {
 
 const VideoContainer = () => {
   const [videos, setVideos] = useState<string[] | null>(null);
+  const [videosRestriction, setVideosRestriction] = useState<{ renderedVideos: string[], maxRowNum: number, maxColNum: number, } | null>(null);
+  const [widthHeight, setWidthHeight] = useState<{ width: number, height: number} | null>(null);
   const videosWrapperRef = useRef<HTMLDivElement>();
 
   useEffect(() => {
-    setVideos([`user-${Math.floor(Math.random() * 100)}`]);
+    setVideos([
+      `user-${Math.floor(Math.random() * 100)}`, `user-${Math.floor(Math.random() * 100)}`,
+    ]);
   }, []);
+
+  useEffect(() => {
+    let wrapperWidth: number | undefined = videosWrapperRef.current?.offsetWidth;
+    let wrapperHeight: number | undefined = videosWrapperRef.current?.offsetHeight;
+
+    if (widthHeight) {
+      handleSetVideosRestriction(widthHeight.width, widthHeight.height);
+    } else {
+      handleSetVideosRestriction(wrapperWidth as number, wrapperHeight as number);
+    }
+  }, [videos, widthHeight]);
+
+  useEffect(() => {
+    if (videosWrapperRef.current) {
+      const observer = new ResizeObserver(entries => {
+        let wrapperWidth = 0;
+        let wrapperHeight = 0;
+
+        entries.forEach(entry => {
+          wrapperWidth = entry.contentRect.width;
+          wrapperHeight = entry.contentRect.height;
+        });
+
+        setWidthHeight({ width: wrapperWidth, height: wrapperHeight, });
+      });
+
+      observer.observe(videosWrapperRef.current as Element);
+    }
+  }, []);
+
+  const handleSetVideosRestriction = (wrapperWidth: number, wrapperHeight: number) => {
+    if (videos) {
+      let cellMinWidth = 160;
+      let cellMinHeight = 180;
+
+      if (window.innerHeight < window.innerWidth) {
+        cellMinWidth = 260;
+        cellMinHeight = 160;
+      }
+
+      const maxRowNum = Math.floor(wrapperHeight / cellMinHeight);
+      const maxColNum = Math.floor(wrapperWidth / cellMinWidth);
+      const maxVideoNum = maxRowNum * maxColNum;
+      const renderedVideos = videos.slice(0, maxVideoNum);
+
+      setVideosRestriction({ renderedVideos, maxRowNum, maxColNum, });
+    }
+  }
 
   const addVideo = () => setVideos(prevState => {
     if (prevState === null) {
@@ -45,22 +97,8 @@ const VideoContainer = () => {
     }
   })
 
-  const renderVideos = (videos: string[]) => {
-    let cellMinWidth = 160;
-    let cellMinHeight = 180;
-
-    if (window.innerHeight < window.innerWidth) {
-      cellMinWidth = 260;
-      cellMinHeight = 160;
-    }
-
-    const wrapperWidth: number | undefined = videosWrapperRef.current?.offsetWidth;
-    const wrapperHeight: number | undefined = videosWrapperRef.current?.offsetHeight;
-    const maxRowNum = Math.floor(wrapperHeight / cellMinHeight);
-    const maxColNum = Math.floor(wrapperWidth / cellMinWidth);
-    const maxVideoNum = maxRowNum * maxColNum;
-
-    const renderedVideos = videos.slice(0, maxVideoNum);
+  const renderVideos = (videosRestriction: { renderedVideos: string[], maxRowNum: number, maxColNum: number, }) => {
+    const { renderedVideos, maxRowNum, maxColNum} = videosRestriction;
     const gridMap = [];
 
     if (window.innerHeight > window.innerWidth) {
@@ -115,7 +153,7 @@ const VideoContainer = () => {
     <Box display='flex' flexDirection='column' flexGrow='1' sx={{ mt: 2, }} onClick={addVideo}>
       <Typography sx={{ mb: 2, '@media (min-width: 600px)': { display: 'none', }, }}>Team Meeting</Typography>
       <Box ref={videosWrapperRef} display='flex' flexGrow='1' flexDirection='column' sx={{ overflow: 'hidden', }}>
-        {videos && renderVideos(videos)}
+        {videosRestriction && renderVideos(videosRestriction)}
       </Box>
     </Box>
   );
