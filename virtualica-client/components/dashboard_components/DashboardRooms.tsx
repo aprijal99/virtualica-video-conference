@@ -23,12 +23,12 @@ const DashboardRooms = () => {
   return (
     <Box
       sx={{
-        maxWidth: '1000px', mx: 'auto', display: 'grid', gridTemplateRows: '50% auto', rowGap: '24px',
+        maxWidth: '1000px', mx: 'auto', display: 'grid', gridTemplateRows: 'auto auto', rowGap: '24px',
         '@media (min-width: 600px)': { height: 'calc(100vh - 70px - 48px)', gridTemplateRows: '1fr', gridTemplateColumns: '1fr 1fr', columnGap: '24px', },
         '@media (min-width: 700px)': { gridTemplateRows: '1fr', gridTemplateColumns: '1.3fr 1.7fr', columnGap: '24px', },
       }}
     >
-      <Box display='flex' flexDirection='column' sx={{ borderRadius: '10px', overflow: 'hidden', }}>
+      <Box display='flex' flexDirection='column' sx={{ borderRadius: '10px', overflow: 'hidden', minHeight: '50vh' }}>
         <Box
           id='room-list' display='flex' justifyContent='space-between' alignItems='center' columnGap='10px'
           sx={{ px: 3, bgcolor: blue['500'], position: 'relative', overflow: 'hidden', minHeight: '80px', }}
@@ -80,7 +80,7 @@ const DashboardRooms = () => {
         {/*  <Typography sx={{ fontSize: '14px', color: grey.A400, }}>Click the room to show the detail</Typography>*/}
         {/*</Box>*/}
 
-        <Box display='flex' flexDirection='column' sx={{ height: '100%', }}>
+        <Box display='flex' flexDirection='column' sx={{ height: '100%', pr: 1, }}>
           <Typography gutterBottom variant='h5' sx={{ fontWeight: '600', mb: 2, }}>Biochemistry Group Discussion</Typography>
           <Box display='flex' columnGap='10px' alignItems='center' sx={{ color: grey['400'], mb: 1, }}>
             <InfoOutlined fontSize='small' sx={{ mb: '2px', }} />
@@ -107,7 +107,7 @@ const DashboardRooms = () => {
               <AccordionSummary expandIcon={<ExpandMore />} sx={{ minHeight: '48px', px: 0, }}>
                 <Typography sx={{ fontWeight: '500', }}>Send Invitation to Contacts</Typography>
               </AccordionSummary>
-              <AccordionDetails sx={{ py: 0, pl: 0, }}>
+              <AccordionDetails sx={{ p: 0, }}>
                 <List
                   sx={{
                     maxHeight: '280px', overflowX: 'hidden', overflowY: 'overlay', scrollbarWidth: 'none',
