@@ -1,4 +1,5 @@
 import {
+  Accordion, AccordionDetails, AccordionSummary,
   Box,
   Button,
   Divider,
@@ -11,8 +12,8 @@ import {blue, grey} from '@mui/material/colors';
 import {
   ContentCopy,
   DeleteOutlined,
-  EditOutlined,
-  InfoOutlined, Link,
+  EditOutlined, ExpandMore,
+  InfoOutlined, Link, PeopleOutlined,
   VideoCallOutlined,
   VideocamOutlined
 } from '@mui/icons-material';
@@ -78,16 +79,31 @@ const DashboardRooms = () => {
             <InfoOutlined fontSize='small' sx={{ mb: '2px', }} />
             <Typography>Room for discussion of Biochemistry Group 5</Typography>
           </Box>
-          <Box display='flex' columnGap='10px' alignItems='center' sx={{ color: grey['400'], }}>
+          <Box display='flex' columnGap='10px' alignItems='center' sx={{ color: grey['400'], mb: 1, }}>
             <Link fontSize='small' sx={{ mb: '2px', transform: 'rotate(-45deg)', }} />
             <Typography>123e4567-e89b-12d3-a456-426614174000</Typography>
           </Box>
+          <Box display='flex' columnGap='10px' alignItems='center' sx={{ color: grey['400'], mb: 1, }}>
+            <PeopleOutlined fontSize='small' sx={{ mb: '2px', }} />
+            <Typography>0 Contacts invited</Typography>
+          </Box>
 
-          <Box display='flex' columnGap='10px' rowGap='10px' flexWrap='wrap' sx={{ mt: 5, }}>
+          <Box display='flex' columnGap='10px' rowGap='10px' flexWrap='wrap' sx={{ my: 5, }}>
             <Button variant='contained' size='small' sx={{ textTransform: 'none', }}>Start</Button>
             <Button variant='outlined' size='small' startIcon={<ContentCopy />} sx={{ textTransform: 'none', }}>Copy Invitation</Button>
             <Button variant='outlined' size='small' startIcon={<EditOutlined />} sx={{ textTransform: 'none', }}>Edit</Button>
             <Button variant='outlined' size='small' startIcon={<DeleteOutlined />} color='error' sx={{ textTransform: 'none', }}>Delete</Button>
+          </Box>
+
+          <Box>
+            <Accordion sx={{ backgroundImage: 'none', boxShadow: 'none', }}>
+              <AccordionSummary expandIcon={<ExpandMore />} sx={{ minHeight: '48px', px: 0, }}>
+                <Typography sx={{ fontWeight: '500', }}>Send Invitation to Contacts</Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ px: 0, }}>
+                Detail
+              </AccordionDetails>
+            </Accordion>
           </Box>
         </Box>
       </Box>

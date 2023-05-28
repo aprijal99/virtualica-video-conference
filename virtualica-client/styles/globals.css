@@ -62,3 +62,16 @@ video {
   top: -160px;
   right: -50px;
 }
+
+.MuiAccordionSummary-root.Mui-expanded {
+  min-height: 48px;
+}
+
+.MuiAccordionSummary-content {
+  order: 1;
+  margin-left: 10px;
+}
+
+.MuiAccordionSummary-content.Mui-expanded {
+  margin: 12px 0 12px 10px;
+}
