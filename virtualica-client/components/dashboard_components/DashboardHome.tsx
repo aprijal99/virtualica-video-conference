@@ -111,12 +111,7 @@ const DashboardHome = () => {
                 primary={msg[2]}
                 secondary={
                   <React.Fragment>
-                    <Typography
-                      component='span'
-                      variant='body2'
-                      color='text.primary'
-                      sx={{ display: 'inline', }}
-                    >
+                    <Typography component='span' variant='body2' color='text.primary' sx={{ display: 'inline', }}>
                       {msg[0]}
                     </Typography>
                     {msg[3]}
