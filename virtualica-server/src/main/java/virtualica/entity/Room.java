@@ -17,6 +17,7 @@ public class Room {
     @Id
     private String id;
     private String roomName;
+    private String roomDescription;
     private Boolean roomStatus;
     @ManyToOne @JoinColumn(name = "owner")
     private User owner;

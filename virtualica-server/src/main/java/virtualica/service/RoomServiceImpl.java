@@ -49,6 +49,7 @@ public class RoomServiceImpl implements RoomService {
     public Room dtoToEntity(RoomDto roomDto, User owner) {
         return Room.builder()
                 .roomName(roomDto.getRoomName())
+                .roomDescription(roomDto.getRoomDescription())
                 .owner(owner)
                 .createdAt(new Timestamp(roomDto.getCreatedAt()))
                 .build();
@@ -59,6 +60,7 @@ public class RoomServiceImpl implements RoomService {
         return RoomDto.builder()
                 .roomId(room.getId())
                 .roomName(room.getRoomName())
+                .roomDescription(room.getRoomDescription())
                 .roomStatus(room.getRoomStatus())
                 .ownerName(room.getOwner().getName())
                 .ownerEmail(room.getOwner().getEmail())
