@@ -4,9 +4,12 @@ import DashboardHome from '@/components/dashboard_components/DashboardHome';
 import DashboardRooms from '@/components/dashboard_components/DashboardRooms';
 import {useState} from 'react';
 import DashboardContacts from '@/components/dashboard_components/DashboardContacts';
+import {GetServerSidePropsContext} from 'next';
+import jwtDecode from 'jwt-decode';
 
-const Dashboard = () => {
-  const [tabValue, setTabValue] = useState(0);
+const Dashboard = ({ email }: { email: string, }) => {
+  const [tabValue, setTabValue] = useState<number>(0);
+  console.log(email);
 
   return (
     <Box>
@@ -21,3 +24,26 @@ const Dashboard = () => {
 }
 
 export default Dashboard;
+
+export const getServerSideProps: (ctx: GetServerSidePropsContext) => Promise<{ redirect: { destination: string } } | { props: {} }> = async (ctx) => {
+  const accessToken: string | undefined = ctx.req.cookies['access_token'];
+  if (accessToken === undefined) return  {
+    redirect: {
+      destination: '/',
+    },
+  }
+
+  const decodedAccessToken: { sub: string, roles: string[], iss: string, exp: number, } = jwtDecode(accessToken);
+  const isValid: boolean = decodedAccessToken.exp > Date.now() / 1000;
+  if (!isValid) return  {
+    redirect: {
+      destination: '/',
+    },
+  }
+
+  return {
+    props: {
+      email: decodedAccessToken.sub,
+    },
+  }
+}
