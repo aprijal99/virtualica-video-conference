@@ -17,9 +17,12 @@ import {
   VideoCallOutlined,
   VideocamOutlined
 } from '@mui/icons-material';
-import React from 'react';
+import React, {useState} from 'react';
+import CreateRoomDialog from '@/components/dashboard_components/CreateRoomDialog';
 
 const DashboardRooms = () => {
+  const [openCreateRoomDialog, setOpenCreateRoomDialog] = useState<boolean>(false);
+
   return (
     <Box
       sx={{
@@ -35,7 +38,7 @@ const DashboardRooms = () => {
         >
           <Typography variant='h6' sx={{ fontWeight: '500', zIndex: 5, }}>Room List</Typography>
           <Button
-            variant='contained' size='small' startIcon={<VideoCallOutlined />}
+            variant='contained' size='small' startIcon={<VideoCallOutlined />} onClick={() => setOpenCreateRoomDialog(true)}
             sx={{ zIndex: 5, textTransform: 'none', boxShadow: 'none', ':hover': { boxShadow: 'none', bgcolor: blue['600'], }, }}
           >
             Create
@@ -141,6 +144,8 @@ const DashboardRooms = () => {
           </Box>
         </Box>
       </Box>
+
+      <CreateRoomDialog open={openCreateRoomDialog} close={() => setOpenCreateRoomDialog(false)} />
     </Box>
   );
 }

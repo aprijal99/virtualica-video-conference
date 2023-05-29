@@ -78,10 +78,12 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
         <DialogContent sx={{ flexGrow: '0', p: '24px !important', }}>
           <TextField
             fullWidth label='Email Address' variant='outlined'
-            value={email} onChange={(e) => setEmail(e.target.value)} sx={{ mb: 2, }} />
+            value={email} onChange={(e) => setEmail(e.target.value)} sx={{ mb: 2, }}
+          />
           <TextField
             fullWidth label='Password' variant='outlined' type='password'
-            value={password} onChange={(e) => setPassword(e.target.value)} sx={{ mb: 1, }} />
+            value={password} onChange={(e) => setPassword(e.target.value)} sx={{ mb: 1, }}
+          />
           <FormControlLabel control={<Checkbox disableRipple />} label='Remember me' sx={{ mb: 1, }} />
           <Button fullWidth variant='contained' onClick={handleLogin}>Login</Button>
 
