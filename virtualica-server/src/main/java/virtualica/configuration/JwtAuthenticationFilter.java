@@ -77,7 +77,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .secure(false) // 'true' in https mode
                 .path("/")
                 .sameSite("lax")
-                .maxAge(Duration.ofMinutes(5))
+                .maxAge(Duration.ofHours(4))
                 .build();
 
 
