@@ -12,9 +12,12 @@ import {
 import {AddBox, ArrowDropDown, ArrowRight, CalendarMonth, Event, Login} from '@mui/icons-material';
 import {blue, grey} from '@mui/material/colors';
 import DateTime from '@/components/dashboard_components/DateTime';
-import React from 'react';
+import React, {useState} from 'react';
+import CreateRoomDialog from '@/components/dashboard_components/CreateRoomDialog';
 
 const DashboardHome = () => {
+  const [openCreateRoomDialog, setOpenCreateRoomDialog] = useState<boolean>(false);
+
   const buttons = ['Create', 'Schedule', 'Join'];
   const recentMessages = [
     ['Aprijal Ghiyas Setiawan', 'https://i.pravatar.cc/150?u=123', 'Brunch this weekend?', ' — I\'ll be in your neighborhood doing errands this…'],
@@ -37,7 +40,10 @@ const DashboardHome = () => {
         }}
       >
         {buttons.map((btn, idx) => (
-          <Box key={idx} display='flex' flexDirection='column' sx={{ aspectRatio: '1/1'}}>
+          <Box
+            key={idx} display='flex' flexDirection='column' sx={{ aspectRatio: '1/1'}}
+            onClick={() => idx === 0 && setOpenCreateRoomDialog(true)}
+          >
             <Button
               variant='outlined'
               sx={{
@@ -123,6 +129,8 @@ const DashboardHome = () => {
           </Box>))}
         </List>
       </Box>
+
+      <CreateRoomDialog open={openCreateRoomDialog} close={() => setOpenCreateRoomDialog(false)} />
     </Box>
   );
 }
