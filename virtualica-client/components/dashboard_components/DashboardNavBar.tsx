@@ -1,16 +1,27 @@
-import {AppBar, Avatar, Box, Link, Toolbar, Typography} from '@mui/material';
+import {AppBar, Avatar, Box, Divider, Link, Menu, Toolbar, Typography} from '@mui/material';
 import {
   Home,
-  HomeOutlined,
+  HomeOutlined, Logout,
   PermContactCalendar,
-  PermContactCalendarOutlined,
+  PermContactCalendarOutlined, Settings,
   Videocam,
   VideocamOutlined
 } from '@mui/icons-material';
 import {blue, grey} from '@mui/material/colors';
+import React, {useContext} from 'react';
+import {UserContext} from '@/context/UserProvider';
 
 const DashboardNavBar = ({ tabValue, changeTab }: { tabValue: number, changeTab: (n: number) => void, }) => {
+  const { userData } = useContext(UserContext);
   const menu = ['Home', 'Rooms', 'Contacts'];
+
+  const profileMenu = ['Settings', 'Sign Out'];
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement | undefined>(null);
+  const openProfileMenu = Boolean(anchorEl);
+  const handleOpenProfileMenu = (event: React.MouseEvent<HTMLDivElement>) => setAnchorEl(event.currentTarget);
+  const handleCloseProfileMenu = () => setAnchorEl(null);
+
+
 
   return (
     <AppBar component='nav' position='static' sx={{ backgroundImage: 'none', boxShadow: 'none', bgcolor: grey['900'], }}>
@@ -38,11 +49,43 @@ const DashboardNavBar = ({ tabValue, changeTab }: { tabValue: number, changeTab:
           </Box>
 
           <Box display='flex' justifyContent='end' flexBasis='33.33%'>
-            <Avatar
-              className='prevent-highlight-on-click' variant='rounded' children={<Typography sx={{ color: 'white', }}>A</Typography>}
-              sx={{ bgcolor: blue['500'], width: '30px', height: '30px', borderRadius: '10px', cursor: 'pointer', }}
-            />
+            <Box onClick={handleOpenProfileMenu}>
+              <Avatar
+                className='prevent-highlight-on-click' variant='rounded' children={<Typography sx={{ color: 'white', }}>A</Typography>}
+                sx={{ bgcolor: blue['500'], width: '30px', height: '30px', borderRadius: '10px', cursor: 'pointer', }}
+              />
+            </Box>
           </Box>
+
+          <Menu
+            open={openProfileMenu} anchorEl={anchorEl} onClose={handleCloseProfileMenu}
+            sx={{ top: '10px', '.MuiList-root': { px: 1, }, }}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right', }}
+            transformOrigin={{ vertical: 'top', horizontal: 'right', }}
+          >
+            <Box
+              className='prevent-highlight-on-click' onClick={handleCloseProfileMenu}
+              display='flex' flexDirection='column' columnGap='10px'
+              sx={{ minHeight: 'initial', px: 1, py: '6px', }}
+            >
+              <Typography sx={{ fontSize: '.95rem', fontWeight: '800', }}>{userData.name}</Typography>
+              <Typography sx={{ fontSize: '.9rem', fontWeight: '300', }}>{userData.email}</Typography>
+            </Box>
+            <Divider sx={{ my: 1, }} />
+            {profileMenu.map((val, idx) => (
+              <Box
+                key={idx} className='prevent-highlight-on-click' onClick={handleCloseProfileMenu}
+                display='flex' justifyContent='start' alignItems='center' columnGap='10px'
+                sx={{
+                  minHeight: 'initial', fontSize: '.9rem', px: 1, py: '6px', cursor: 'pointer',
+                  borderRadius: '4px', ':hover': { bgcolor: grey['800'], },
+                }}
+              >
+                {idx === 0 ? <Settings fontSize='small' /> : <Logout fontSize='small' />}
+                {val}
+              </Box>
+            ))}
+          </Menu>
         </Box>
       </Toolbar>
     </AppBar>

@@ -1,7 +1,7 @@
-import React from 'react';
 import UserProvider from '@/context/UserProvider';
+import {ReactNode} from 'react';
 
-const MainProvider: React.FC = ({ children }) => {
+const MainProvider = ({ children }: { children: ReactNode, }) => {
   return (
     <UserProvider>
       {children}

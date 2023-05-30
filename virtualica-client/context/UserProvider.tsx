@@ -1,4 +1,4 @@
-import React, {createContext, useState} from 'react';
+import {createContext, ReactNode, useState} from 'react';
 
 export type UserType = {
   name: string,
@@ -19,7 +19,7 @@ const initialUserContext: UserContextProps = {
 
 export const UserContext = createContext<UserContextProps>(initialUserContext);
 
-const UserProvider: React.FC = ({ children }) => {
+const UserProvider = ({ children }: { children: ReactNode, }) => {
   const [userData, setUserData] = useState<UserType>(initialUserContext.userData);
   const handleSetUserData = (userData: UserType) => setUserData(userData);
 
