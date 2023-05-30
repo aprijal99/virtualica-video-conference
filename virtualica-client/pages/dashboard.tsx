@@ -2,14 +2,17 @@ import {Box} from '@mui/material';
 import DashboardNavBar from '@/components/dashboard_components/DashboardNavBar';
 import DashboardHome from '@/components/dashboard_components/DashboardHome';
 import DashboardRooms from '@/components/dashboard_components/DashboardRooms';
-import {useState} from 'react';
+import {useContext, useState} from 'react';
 import DashboardContacts from '@/components/dashboard_components/DashboardContacts';
 import {GetServerSidePropsContext} from 'next';
 import jwtDecode from 'jwt-decode';
+import {UserContext} from '@/context/UserProvider';
 
 const Dashboard = ({ email }: { email: string, }) => {
   const [tabValue, setTabValue] = useState<number>(0);
-  console.log(email);
+  const { handleSetUserData } = useContext(UserContext);
+
+
 
   return (
     <Box>

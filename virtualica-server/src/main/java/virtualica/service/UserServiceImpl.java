@@ -50,6 +50,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public UserDto entityToDto(User user) {
+        return UserDto.builder()
+                .name(user.getName())
+                .email(user.getEmail())
+                .build();
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = this.findUserByEmail(email);
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole()));

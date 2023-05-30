@@ -8,4 +8,5 @@ public interface UserService {
     User findUserById(String id);
     User findUserByEmail(String email);
     User dtoToEntity(UserDto userDto);
+    UserDto entityToDto(User user);
 }
