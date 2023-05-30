@@ -8,6 +8,7 @@ import jwtDecode from 'jwt-decode';
 import {UserContext, UserType} from '@/context/UserProvider';
 import {ApiType} from '@/type/api';
 import {GetServerSideProps} from 'next';
+import cookie from 'cookie';
 
 const Dashboard = ({ userData }: { userData: UserType, }) => {
   const [tabValue, setTabValue] = useState<number>(0);
@@ -29,9 +30,17 @@ const Dashboard = ({ userData }: { userData: UserType, }) => {
   );
 }
 
-export default Dashboard;
-
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  if (ctx.req.method === 'POST') {
+    ctx.res.setHeader('Set-Cookie', cookie.serialize('access_token', '', { maxAge: 0, }));
+    return {
+      redirect: {
+        destination: '/',
+        statusCode: 302,
+      },
+    }
+  }
+
   const accessToken: string | undefined = ctx.req.cookies['access_token'];
   if (accessToken === undefined) return  {
     redirect: {
@@ -58,3 +67,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     },
   }
 }
+
+export default Dashboard;

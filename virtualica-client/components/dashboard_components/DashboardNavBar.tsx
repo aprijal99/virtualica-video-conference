@@ -7,7 +7,7 @@ import {
   Videocam,
   VideocamOutlined
 } from '@mui/icons-material';
-import {blue, grey} from '@mui/material/colors';
+import {blue, grey, red} from '@mui/material/colors';
 import React, {useContext} from 'react';
 import {UserContext} from '@/context/UserProvider';
 
@@ -20,8 +20,6 @@ const DashboardNavBar = ({ tabValue, changeTab }: { tabValue: number, changeTab:
   const openProfileMenu = Boolean(anchorEl);
   const handleOpenProfileMenu = (event: React.MouseEvent<HTMLDivElement>) => setAnchorEl(event.currentTarget);
   const handleCloseProfileMenu = () => setAnchorEl(null);
-
-
 
   return (
     <AppBar component='nav' position='static' sx={{ backgroundImage: 'none', boxShadow: 'none', bgcolor: grey['900'], }}>
@@ -74,17 +72,23 @@ const DashboardNavBar = ({ tabValue, changeTab }: { tabValue: number, changeTab:
             <Divider sx={{ my: 1, }} />
             {profileMenu.map((val, idx) => (
               <Box
-                key={idx} className='prevent-highlight-on-click' onClick={handleCloseProfileMenu}
+                key={idx} className='prevent-highlight-on-click'
                 display='flex' justifyContent='start' alignItems='center' columnGap='10px'
+                onClick={idx === 0 ? handleCloseProfileMenu : () => {
+                  const logoutForm = document.getElementById('logoutForm') as HTMLFormElement;
+                  logoutForm.submit();
+                  handleCloseProfileMenu();
+                }}
                 sx={{
-                  minHeight: 'initial', fontSize: '.9rem', px: 1, py: '6px', cursor: 'pointer',
+                  minHeight: 'initial', px: 1, py: '6px', cursor: 'pointer',
                   borderRadius: '4px', ':hover': { bgcolor: grey['800'], },
                 }}
               >
-                {idx === 0 ? <Settings fontSize='small' /> : <Logout fontSize='small' />}
-                {val}
+                {idx === 0 ? <Settings fontSize='small' /> : <Logout fontSize='small' color='error' />}
+                <Typography sx={{ fontSize: '.9rem', color: idx === 1 ? red.A400 : 'white', }}>{val}</Typography>
               </Box>
             ))}
+            <form id='logoutForm' action='/dashboard' method='POST' style={{ visibility: 'hidden', }}></form>
           </Menu>
         </Box>
       </Toolbar>
