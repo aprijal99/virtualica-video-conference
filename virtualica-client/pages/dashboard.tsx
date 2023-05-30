@@ -2,17 +2,20 @@ import {Box} from '@mui/material';
 import DashboardNavBar from '@/components/dashboard_components/DashboardNavBar';
 import DashboardHome from '@/components/dashboard_components/DashboardHome';
 import DashboardRooms from '@/components/dashboard_components/DashboardRooms';
-import {useContext, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import DashboardContacts from '@/components/dashboard_components/DashboardContacts';
-import {GetServerSidePropsContext} from 'next';
 import jwtDecode from 'jwt-decode';
-import {UserContext} from '@/context/UserProvider';
+import {UserContext, UserType} from '@/context/UserProvider';
+import {ApiType} from '@/type/api';
+import {GetServerSideProps} from 'next';
 
-const Dashboard = ({ email }: { email: string, }) => {
+const Dashboard = ({ userData }: { userData: UserType, }) => {
   const [tabValue, setTabValue] = useState<number>(0);
   const { handleSetUserData } = useContext(UserContext);
 
-
+  useEffect(() => {
+    if (handleSetUserData) handleSetUserData(userData);
+  }, []);
 
   return (
     <Box>
@@ -28,11 +31,12 @@ const Dashboard = ({ email }: { email: string, }) => {
 
 export default Dashboard;
 
-export const getServerSideProps: (ctx: GetServerSidePropsContext) => Promise<{ redirect: { destination: string } } | { props: {} }> = async (ctx) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const accessToken: string | undefined = ctx.req.cookies['access_token'];
   if (accessToken === undefined) return  {
     redirect: {
       destination: '/',
+      statusCode: 302,
     },
   }
 
@@ -41,12 +45,16 @@ export const getServerSideProps: (ctx: GetServerSidePropsContext) => Promise<{ r
   if (!isValid) return  {
     redirect: {
       destination: '/',
+      statusCode: 302,
     },
   }
 
+  const result = await fetch(`http://localhost:7181/user?email=${decodedAccessToken.sub}`);
+  const apiResult: ApiType<UserType> = await result.json();
+
   return {
     props: {
-      email: decodedAccessToken.sub,
+      userData: apiResult.data,
     },
   }
 }

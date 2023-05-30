@@ -13,6 +13,7 @@ import virtualica.util.ApiResponse;
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/user")
+@CrossOrigin(origins = {"http://localhost:3000"})
 public class UserController {
     private final UserService userService;
 

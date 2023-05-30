@@ -16,17 +16,8 @@ import {useState} from 'react';
 import CustomBackdrop from '@/components/feedback_components/CustomBackdrop';
 import CustomSnackbar from '@/components/feedback_components/CustomSnackbar';
 import {blue} from '@mui/material/colors';
+import {ApiType} from '@/type/api';
 
-type ApiType<T> = {
-  code: number,
-  data?: T,
-  status: string,
-}
-
-type LoginResult = {
-  access_token: string,
-  refresh_token: string,
-}
 
 const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDialog: boolean, handleCloseLoginDialog: () => void, }) => {
   const [email, setEmail] = useState<string>('');
@@ -49,7 +40,7 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
         body: encodedFormBody,
       });
 
-      const apiResult: ApiType<LoginResult> = await fetchResult.json();
+      const apiResult: ApiType<{ access_token: string, refresh_token: string, }> = await fetchResult.json();
       if (apiResult.code === 200) {
         setAlertMessage({ severity: 'success', message: 'Login succeed, redirect to dashboard', });
         window.location.href = ('http://localhost:3000/dashboard');
