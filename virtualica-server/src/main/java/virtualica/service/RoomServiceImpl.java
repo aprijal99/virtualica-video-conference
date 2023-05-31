@@ -11,6 +11,7 @@ import virtualica.repository.RoomRepository;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -72,5 +73,12 @@ public class RoomServiceImpl implements RoomService {
                 .ownerEmail(room.getOwner().getEmail())
                 .createdAt(room.getCreatedAt().getTime())
                 .build();
+    }
+
+    @Override
+    public List<RoomDto> entityListToDtoList(List<Room> roomList) {
+        return roomList.stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
     }
 }

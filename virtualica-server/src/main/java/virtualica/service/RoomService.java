@@ -18,4 +18,5 @@ public interface RoomService {
     void deleteRoom(String roomId);
     Room dtoToEntity(RoomDto roomDto, User owner);
     RoomDto entityToDto(Room room);
+    List<RoomDto> entityListToDtoList(List<Room> roomList);
 }

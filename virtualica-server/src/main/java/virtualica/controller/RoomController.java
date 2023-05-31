@@ -44,9 +44,10 @@ public class RoomController {
     public ResponseEntity<?> getRoomListByUserEmail(@PathVariable(name = "email") String userEmail) {
         User owner = userService.findUserByEmail(userEmail);
         List<Room> roomList = roomService.findRoomsByOwner(owner);
+        List<RoomDto> roomDtoList = roomService.entityListToDtoList(roomList);
 
         return ResponseEntity.status(HttpStatus.FOUND)
-                .body(ApiResponse.jsonWithData(HttpStatus.FOUND, roomList));
+                .body(ApiResponse.jsonWithData(HttpStatus.FOUND, roomDtoList));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

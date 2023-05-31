@@ -18,13 +18,21 @@ import {
   VideoCallOutlined,
   VideocamOutlined
 } from '@mui/icons-material';
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import CreateRoomDialog from '@/components/dashboard_components/CreateRoomDialog';
-import {RoomContext} from '@/context/RoomProvider';
+import {RoomContext, RoomType} from '@/context/RoomProvider';
 
 const DashboardRooms = () => {
-  const { roomList, selectedRoom } = useContext(RoomContext);
+  const { roomList, selectedRoom, handleChangeSelectedRoom } = useContext(RoomContext);
   const [openCreateRoomDialog, setOpenCreateRoomDialog] = useState<boolean>(false);
+  const [room, setRoom] = useState<RoomType | null>(null);
+
+  useEffect(() => {
+    if (selectedRoom !== '') {
+      console.log(selectedRoom);
+      setRoom(roomList.filter((room) => room.roomId === selectedRoom)[0]);
+    }
+  }, [selectedRoom]);
 
   return (
     <Box
@@ -64,7 +72,10 @@ const DashboardRooms = () => {
             </Box> :
             <List>
               {roomList.map((room, idx) => (
-                <Box key={idx}>
+                <Box key={idx} onClick={() => {
+                  handleChangeSelectedRoom && handleChangeSelectedRoom(room.roomId);
+                  console.log(roomList);
+                }}>
                   <ListItemButton>
                     <ListItemText
                       primary={<Typography sx={{ fontWeight: '600', }}>{room.roomName}</Typography>}
@@ -88,24 +99,24 @@ const DashboardRooms = () => {
           ':hover': { '::-webkit-scrollbar-thumb': { visibility: 'visible', }, scrollbarWidth: 'thin', },
         }}
       >
-        {selectedRoom === '' ?
+        {room === null ?
           <Box display='flex' flexDirection='column' justifyContent='center' alignItems='center' rowGap='20px' sx={{ height: '100%', }}>
             <img src='/room-detail.png' alt='room detail' style={{ maxWidth: '200px', }} />
             <Typography sx={{ fontSize: '14px', color: grey.A400, }}>Click the room to show the detail</Typography>
           </Box> :
           <Box display='flex' flexDirection='column' sx={{ height: '100%', pr: 1, }}>
-            <Typography gutterBottom variant='h5' sx={{ fontWeight: '600', mb: 2, }}>Biochemistry Group Discussion</Typography>
+            <Typography gutterBottom variant='h5' sx={{ fontWeight: '600', mb: 2, }}>{room.roomName}</Typography>
             <Box display='flex' columnGap='10px' alignItems='center' sx={{ color: grey['400'], mb: 1, }}>
               <InfoOutlined fontSize='small' sx={{ mb: '2px', }} />
-              <Typography>Room for discussion of Biochemistry Group 5</Typography>
+              <Typography>{room.roomDescription}</Typography>
             </Box>
             <Box display='flex' columnGap='10px' alignItems='center' sx={{ color: grey['400'], mb: 1, }}>
               <Link fontSize='small' sx={{ mb: '2px', transform: 'rotate(-45deg)', }} />
-              <Typography>123e4567-e89b-12d3-a456-426614174000</Typography>
+              <Typography>{room.roomId}</Typography>
             </Box>
             <Box display='flex' columnGap='10px' alignItems='center' sx={{ color: grey['400'], mb: 1, }}>
               <AccessTime fontSize='small' sx={{ mb: '2px', }} />
-              <Typography>Created at June 15, 2023</Typography>
+              <Typography>Created at {new Date(room.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', })}</Typography>
             </Box>
             <Box display='flex' columnGap='10px' alignItems='center' sx={{ color: grey['400'], mb: 1, }}>
               <PeopleOutlined fontSize='small' sx={{ mb: '2px', }} />
