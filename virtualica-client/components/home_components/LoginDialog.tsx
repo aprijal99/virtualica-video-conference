@@ -18,9 +18,9 @@ import {FeedbackContext} from '@/context/FeedbackProvider';
 
 
 const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDialog: boolean, handleCloseLoginDialog: () => void, }) => {
-  const { toggleBackdrop, toggleAlert, handleSetAlertMessage } = useContext(FeedbackContext);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const { toggleBackdrop, toggleAlert, handleSetAlertMessage } = useContext(FeedbackContext);
 
   const handleLogin = async () => {
     if (email !== '' && password !== '') {

@@ -10,9 +10,13 @@ import {ApiType} from '@/type/api';
 import {GetServerSideProps} from 'next';
 import cookie from 'cookie';
 import {RoomContext, RoomType} from '@/context/RoomProvider';
+import {FeedbackContext} from '@/context/FeedbackProvider';
+import CustomBackdrop from '@/components/feedback_components/CustomBackdrop';
+import CustomSnackbar from '@/components/feedback_components/CustomSnackbar';
 
 const Dashboard = ({ userData }: { userData: UserType, }) => {
   const [tabValue, setTabValue] = useState<number>(0);
+  const { backdrop, alert, alertMessage, toggleAlert } = useContext(FeedbackContext);
   const { handleSetUserData } = useContext(UserContext);
   const { handleAddRoomList } = useContext(RoomContext);
 
@@ -35,6 +39,9 @@ const Dashboard = ({ userData }: { userData: UserType, }) => {
         {tabValue === 1 && <DashboardRooms />}
         {tabValue === 2 && <DashboardContacts />}
       </Box>
+
+      <CustomBackdrop backdropLoading={backdrop} />
+      <CustomSnackbar openAlert={alert} closeAlert={() => toggleAlert && toggleAlert()} alertMessage={alertMessage.message} alertSeverity={alertMessage.severity} />
     </Box>
   );
 }

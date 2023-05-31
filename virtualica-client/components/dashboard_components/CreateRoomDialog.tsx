@@ -3,8 +3,10 @@ import {useContext, useState} from 'react';
 import {UserContext} from '@/context/UserProvider';
 import {ApiType} from '@/type/api';
 import {RoomContext} from '@/context/RoomProvider';
+import {FeedbackContext} from '@/context/FeedbackProvider';
 
 const CreateRoomDialog = ({ open, close }: { open: boolean, close: () => void, }) => {
+  const { toggleBackdrop, toggleAlert, handleSetAlertMessage } = useContext(FeedbackContext);
   const { userData } = useContext(UserContext);
   const { handleAddRoom } = useContext(RoomContext);
   const [roomName, setRoomName] = useState<string>('');
@@ -12,6 +14,8 @@ const CreateRoomDialog = ({ open, close }: { open: boolean, close: () => void, }
 
   const submitNewRoom = async () => {
     if (roomName !== '' && roomDescription !== '') {
+      if (toggleBackdrop) toggleBackdrop();
+
       const fetchResult = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/room`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', },
@@ -25,6 +29,8 @@ const CreateRoomDialog = ({ open, close }: { open: boolean, close: () => void, }
       const apiResult: ApiType<{ roomId: string, }> = await fetchResult.json();
 
       if (apiResult.code === 201 && handleAddRoom) {
+        if (handleSetAlertMessage) handleSetAlertMessage({ severity: 'success', message: 'Successfully created a new room', });
+
         handleAddRoom({
           roomId: apiResult.data?.roomId as string,
           roomName,
@@ -35,7 +41,12 @@ const CreateRoomDialog = ({ open, close }: { open: boolean, close: () => void, }
         close();
         setRoomName('');
         setRoomDescription('');
+      } else {
+        if (handleSetAlertMessage) handleSetAlertMessage({ severity: 'error', message: 'Something went wrong', });
       }
+
+      if (toggleBackdrop) toggleBackdrop();
+      if (toggleAlert) toggleAlert();
     }
   }
 
