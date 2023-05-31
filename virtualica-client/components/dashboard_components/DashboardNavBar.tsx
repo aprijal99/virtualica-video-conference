@@ -25,6 +25,7 @@ const DashboardNavBar = ({ tabValue, changeTab }: { tabValue: number, changeTab:
     <AppBar component='nav' position='static' sx={{ backgroundImage: 'none', boxShadow: 'none', bgcolor: grey['900'], }}>
       <Toolbar sx={{ minHeight: '70px', padding: '0 24px', '@media (min-width: 600px)': { minHeight: '70px', }, }}>
         <Box display='flex' alignItems='center' sx={{ width: '100%', maxWidth: '1000px', mx: 'auto', }}>
+          {/* LOGO */}
           <Box display='flex' alignItems='center' flexBasis='33.33%'>
             <Link href='/' className='prevent-highlight-on-click' sx={{ display: 'flex', }}>
               <img src='/virtualica.png' alt='logo' style={{ width: '30px', marginRight: '10px', }} />
@@ -32,6 +33,7 @@ const DashboardNavBar = ({ tabValue, changeTab }: { tabValue: number, changeTab:
             <Typography variant='h6' component='div' display='none' sx={{ fontWeight: 'bold', '@media (min-width: 600px)': { display: 'initial', }, }}>Dashboard</Typography>
           </Box>
 
+          {/* CENTER MENU */}
           <Box display='flex' justifyContent='center' flexBasis='33.33%'>
             {menu.map((m, idx) => (
               <Box
@@ -46,15 +48,17 @@ const DashboardNavBar = ({ tabValue, changeTab }: { tabValue: number, changeTab:
             ))}
           </Box>
 
+          {/* PROFILE BUTTON */}
           <Box display='flex' justifyContent='end' flexBasis='33.33%'>
             <Box onClick={handleOpenProfileMenu}>
               <Avatar
-                className='prevent-highlight-on-click' variant='rounded' children={<Typography sx={{ color: 'white', }}>A</Typography>}
+                className='prevent-highlight-on-click' variant='rounded' children={<Typography sx={{ color: 'white', }}>{userData.name[0]}</Typography>}
                 sx={{ bgcolor: blue['500'], width: '30px', height: '30px', borderRadius: '10px', cursor: 'pointer', }}
               />
             </Box>
           </Box>
 
+          {/*PROFILE MENU */}
           <Menu
             open={openProfileMenu} anchorEl={anchorEl} onClose={handleCloseProfileMenu}
             sx={{ top: '10px', '.MuiList-root': { px: 1, }, }}
