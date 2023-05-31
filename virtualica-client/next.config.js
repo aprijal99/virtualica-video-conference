@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   env: {
-    NEXT_PUBLIC_SERVER_URL: 'https://virtualica-signaling-server.onrender.com',
+    NEXT_PUBLIC_SERVER_URL: 'http://localhost:7181',
   },
   // output: 'standalone',
 }

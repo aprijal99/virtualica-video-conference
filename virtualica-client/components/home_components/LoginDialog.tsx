@@ -33,7 +33,7 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
       const formBody: { [n: string]: string } = { email: email, password: password, }
       const encodedFormBody = Object.keys(formBody).map((key: string) => encodeURIComponent(key) + '=' + encodeURIComponent(formBody[key])).join('&');
 
-      const fetchResult = await fetch('http://localhost:7181/login', {
+      const fetchResult = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/login`, {
         credentials: 'include',
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', },

@@ -58,7 +58,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     },
   }
 
-  const result = await fetch(`http://localhost:7181/user?email=${decodedAccessToken.sub}`);
+  const result = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/user?email=${decodedAccessToken.sub}`);
   const apiResult: ApiType<UserType> = await result.json();
 
   return {

@@ -37,7 +37,9 @@ const RoomProvider = ({ children }: { children: ReactNode, }) => {
   const handleChangeSelectedRoom = (roomId: string) => setSelectedRoom(roomId);
 
   return (
-    <RoomContext.Provider value={{ roomList, selectedRoom }}>
+    <RoomContext.Provider
+      value={{ roomList, selectedRoom, handleGetRoomList, handleGetRoomDetail, handleAddRoom, handleAddRoomList, handleRemoveRoom, handleChangeSelectedRoom }}
+    >
       {children}
     </RoomContext.Provider>
   );
