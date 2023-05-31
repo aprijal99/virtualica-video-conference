@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import {blue, grey} from '@mui/material/colors';
 import {
+  AccessTime,
   ContentCopy,
   DeleteOutlined,
   EditOutlined, ExpandMore,
@@ -31,6 +32,7 @@ const DashboardRooms = () => {
         '@media (min-width: 700px)': { gridTemplateRows: '1fr', gridTemplateColumns: '1.3fr 1.7fr', columnGap: '24px', },
       }}
     >
+      {/* ROOM LIST */}
       <Box display='flex' flexDirection='column' sx={{ borderRadius: '10px', overflow: 'hidden', minHeight: '50vh' }}>
         <Box
           id='room-list' display='flex' justifyContent='space-between' alignItems='center' columnGap='10px'
@@ -62,7 +64,7 @@ const DashboardRooms = () => {
             <ListItemButton>
               <ListItemText
                 primary={<Typography sx={{ fontWeight: '600', }}>Biochemistry Group Discussion</Typography>}
-                secondary='Room for discussion of Biochemistry Group 5'
+                secondary='Created at June 15, 2023'
               />
             </ListItemButton>
             <Divider  component="li" />
@@ -70,6 +72,7 @@ const DashboardRooms = () => {
         </Box>
       </Box>
 
+      {/* ROOM DETAIL*/}
       <Box
         sx={{
           overflowX: 'hidden', overflowY: 'overlay', scrollbarWidth: 'none',
@@ -92,6 +95,10 @@ const DashboardRooms = () => {
           <Box display='flex' columnGap='10px' alignItems='center' sx={{ color: grey['400'], mb: 1, }}>
             <Link fontSize='small' sx={{ mb: '2px', transform: 'rotate(-45deg)', }} />
             <Typography>123e4567-e89b-12d3-a456-426614174000</Typography>
+          </Box>
+          <Box display='flex' columnGap='10px' alignItems='center' sx={{ color: grey['400'], mb: 1, }}>
+            <AccessTime fontSize='small' sx={{ mb: '2px', }} />
+            <Typography>Created at June 15, 2023</Typography>
           </Box>
           <Box display='flex' columnGap='10px' alignItems='center' sx={{ color: grey['400'], mb: 1, }}>
             <PeopleOutlined fontSize='small' sx={{ mb: '2px', }} />
@@ -145,6 +152,7 @@ const DashboardRooms = () => {
         </Box>
       </Box>
 
+      {/* CREATE ROOM DIALOG */}
       <CreateRoomDialog open={openCreateRoomDialog} close={() => setOpenCreateRoomDialog(false)} />
     </Box>
   );

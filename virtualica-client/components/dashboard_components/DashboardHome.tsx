@@ -33,6 +33,8 @@ const DashboardHome = () => {
         '@media (min-width: 600px)': { gridTemplateColumns: '140px calc(50% - 164px) 1fr', gridTemplateRows: 'auto auto', columnGap: '24px' },
       }}
     >
+
+      {/* THREE BUTTONS CREATE, SCHEDULE, AND JOIN*/}
       <Box
         sx={{
           display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px',
@@ -61,6 +63,7 @@ const DashboardHome = () => {
         ))}
       </Box>
 
+      {/* SCHEDULE */}
       <Box
         display='flex' flexDirection='column'
         sx={{ borderRadius: '10px', overflow: 'hidden', '@media (min-width: 600px)': { gridColumn: '2 / span 2', }, }}
@@ -85,6 +88,7 @@ const DashboardHome = () => {
         </Box>
       </Box>
 
+      {/* RECENT MESSAGE */}
       <Box
         display='flex' flexDirection='column'
         sx={{ borderRadius: '10px', overflow: 'hidden', '@media (min-width: 600px)': { gridColumn: '1 / span 3', }, }}
@@ -130,6 +134,7 @@ const DashboardHome = () => {
         </List>
       </Box>
 
+      {/* CREATE ROOM DIALOG */}
       <CreateRoomDialog open={openCreateRoomDialog} close={() => setOpenCreateRoomDialog(false)} />
     </Box>
   );

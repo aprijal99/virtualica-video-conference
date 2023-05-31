@@ -12,8 +12,8 @@ interface UserContextProps {
 
 const initialUserContext: UserContextProps = {
   userData: {
-    name: 'Aprijal Ghiyas Setiawan',
-    email: 'aprijalghiyas@gmail.com',
+    name: '',
+    email: '',
   },
 }
 
