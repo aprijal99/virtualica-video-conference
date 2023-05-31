@@ -19,6 +19,7 @@ import java.util.Map;
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/room")
+@CrossOrigin(origins = {"http://localhost:3000"})
 public class RoomController {
     private final UserService userService;
     private final RoomService roomService;
@@ -44,13 +45,8 @@ public class RoomController {
         User owner = userService.findUserByEmail(userEmail);
         List<Room> roomList = roomService.findRoomsByOwner(owner);
 
-        if (roomList == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ApiResponse.jsonNoData(HttpStatus.NOT_FOUND));
-        } else {
-            return ResponseEntity.status(HttpStatus.FOUND)
-                    .body(ApiResponse.jsonWithData(HttpStatus.FOUND, roomList));
-        }
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .body(ApiResponse.jsonWithData(HttpStatus.FOUND, roomList));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

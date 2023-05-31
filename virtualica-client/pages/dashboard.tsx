@@ -9,14 +9,23 @@ import {UserContext, UserType} from '@/context/UserProvider';
 import {ApiType} from '@/type/api';
 import {GetServerSideProps} from 'next';
 import cookie from 'cookie';
+import {RoomContext, RoomType} from '@/context/RoomProvider';
 
 const Dashboard = ({ userData }: { userData: UserType, }) => {
   const [tabValue, setTabValue] = useState<number>(0);
   const { handleSetUserData } = useContext(UserContext);
+  const { handleAddRoomList } = useContext(RoomContext);
 
   useEffect(() => {
     if (handleSetUserData) handleSetUserData(userData);
+    getRoomList();
   }, []);
+
+  const getRoomList = async () => {
+    const fetchResult = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/room/room-list/${userData.email}`);
+    const apiResult: ApiType<RoomType[]> = await fetchResult.json();
+    if (handleAddRoomList) handleAddRoomList(apiResult.data as RoomType[]);
+  }
 
   return (
     <Box>
