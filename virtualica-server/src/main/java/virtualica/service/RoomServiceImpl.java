@@ -9,6 +9,7 @@ import virtualica.entity.User;
 import virtualica.repository.RoomRepository;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -29,6 +30,11 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public Room findRoomById(String roomId) {
         return roomRepository.findById(roomId).orElse(null);
+    }
+
+    @Override
+    public List<Room> findRoomsByOwner(User owner) {
+        return roomRepository.findRoomsByOwner(owner).orElse(null);
     }
 
     @Override

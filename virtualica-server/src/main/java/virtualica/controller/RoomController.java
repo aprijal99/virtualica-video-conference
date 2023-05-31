@@ -13,6 +13,7 @@ import virtualica.service.SessionService;
 import virtualica.service.UserService;
 import virtualica.util.ApiResponse;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -23,7 +24,7 @@ public class RoomController {
     private final RoomService roomService;
     private final SessionService sessionService;
 
-    @GetMapping(path = "/{roomId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/room-detail/{roomId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getRoomById(@PathVariable(name = "roomId") String roomId) {
         Room room = roomService.findRoomById(roomId);
 
@@ -35,6 +36,20 @@ public class RoomController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ApiResponse.jsonNoData(HttpStatus.NOT_FOUND));
+        }
+    }
+
+    @GetMapping(path = "/room-list/{email}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getRoomListByUserEmail(@PathVariable(name = "email") String userEmail) {
+        User owner = userService.findUserByEmail(userEmail);
+        List<Room> roomList = roomService.findRoomsByOwner(owner);
+
+        if (roomList == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.jsonNoData(HttpStatus.NOT_FOUND));
+        } else {
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .body(ApiResponse.jsonWithData(HttpStatus.FOUND, roomList));
         }
     }
 
