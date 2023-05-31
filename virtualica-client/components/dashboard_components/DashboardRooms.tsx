@@ -63,13 +63,17 @@ const DashboardRooms = () => {
               <Typography sx={{ fontSize: '14px', color: grey.A400, }}>You haven't created a room</Typography>
             </Box> :
             <List>
-              <ListItemButton>
-                <ListItemText
-                  primary={<Typography sx={{ fontWeight: '600', }}>Biochemistry Group Discussion</Typography>}
-                  secondary='Created at June 15, 2023'
-                />
-              </ListItemButton>
-              <Divider  component="li" />
+              {roomList.map((room, idx) => (
+                <Box key={idx}>
+                  <ListItemButton>
+                    <ListItemText
+                      primary={<Typography sx={{ fontWeight: '600', }}>{room.roomName}</Typography>}
+                      secondary={`Created at ${new Date(room.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', })}`}
+                    />
+                  </ListItemButton>
+                  <Divider component="li" sx={{ width: '95%', mx: 'auto', }} />
+                </Box>
+              ))}
             </List>
           }
         </Box>

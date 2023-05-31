@@ -19,6 +19,7 @@ const CreateRoomDialog = ({ open, close }: { open: boolean, close: () => void, }
           roomName,
           roomDescription,
           ownerEmail: userData.email,
+          createdAt: new Date().getTime(),
         }),
       });
       const apiResult: ApiType<{ roomId: string, }> = await fetchResult.json();
