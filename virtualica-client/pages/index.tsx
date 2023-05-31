@@ -3,8 +3,14 @@ import {GitHub, LinkedIn} from '@mui/icons-material';
 import Carousel from '@/components/home_components/Carousel';
 import Banner from '@/components/home_components/Banner';
 import HomeNavBar from '@/components/home_components/HomeNavBar';
+import {useContext} from 'react';
+import {FeedbackContext} from '../context/FeedbackProvider';
+import CustomBackdrop from '../components/feedback_components/CustomBackdrop';
+import CustomSnackbar from '../components/feedback_components/CustomSnackbar';
 
 const Home = () => {
+  const { backdrop, alert, alertMessage, toggleAlert } = useContext(FeedbackContext);
+
   return (
     <Box sx={{ maxWidth: '1000px', m: '0 auto', }}>
       {/* NAVBAR */}
@@ -35,6 +41,9 @@ const Home = () => {
           <Link target='_blank' href='https://www.linkedin.com/in/aprijalghiyas/'><LinkedIn sx={{ color: 'white', }} /></Link>
         </Box>
       </Box>
+
+      <CustomBackdrop backdropLoading={backdrop} />
+      <CustomSnackbar openAlert={alert} closeAlert={() => toggleAlert && toggleAlert()} alertMessage={alertMessage.message} alertSeverity={alertMessage.severity} />
     </Box>
   );
 }

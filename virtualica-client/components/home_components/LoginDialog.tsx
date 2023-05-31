@@ -1,5 +1,4 @@
 import {
-  AlertColor,
   Avatar,
   Box,
   Button, Checkbox,
@@ -12,23 +11,20 @@ import {
   useMediaQuery
 } from '@mui/material';
 import {Close, LockOutlined} from '@mui/icons-material';
-import {useState} from 'react';
-import CustomBackdrop from '@/components/feedback_components/CustomBackdrop';
-import CustomSnackbar from '@/components/feedback_components/CustomSnackbar';
+import {useContext, useState} from 'react';
 import {blue} from '@mui/material/colors';
 import {ApiType} from '@/type/api';
+import {FeedbackContext} from '@/context/FeedbackProvider';
 
 
 const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDialog: boolean, handleCloseLoginDialog: () => void, }) => {
+  const { toggleBackdrop, toggleAlert, handleSetAlertMessage } = useContext(FeedbackContext);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [backdrop, setBackdrop] = useState<boolean>(false);
-  const [alert, setAlert] = useState<boolean>(false);
-  const [alertMessage, setAlertMessage] = useState<{ severity: AlertColor, message: string, }>({ severity: 'success', message: '', });
 
   const handleLogin = async () => {
     if (email !== '' && password !== '') {
-      setBackdrop(true);
+      if (toggleBackdrop) toggleBackdrop();
 
       const formBody: { [n: string]: string } = { email: email, password: password, }
       const encodedFormBody = Object.keys(formBody).map((key: string) => encodeURIComponent(key) + '=' + encodeURIComponent(formBody[key])).join('&');
@@ -42,18 +38,18 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
 
       const apiResult: ApiType<{ access_token: string, refresh_token: string, }> = await fetchResult.json();
       if (apiResult.code === 200) {
-        setAlertMessage({ severity: 'success', message: 'Login succeed, redirect to dashboard', });
+        if (handleSetAlertMessage) handleSetAlertMessage({ severity: 'success', message: 'Login succeed, redirect to dashboard', });
         window.location.href = ('http://localhost:3000/dashboard');
       } else {
-        setAlertMessage({ severity: 'error', message: 'Email or password is wrong', });
+        if (handleSetAlertMessage) handleSetAlertMessage({ severity: 'error', message: 'Email or password is wrong', });
       }
 
-      setBackdrop(false);
+      if (toggleBackdrop) toggleBackdrop();
     } else {
-      setAlertMessage({ severity: 'warning', message: 'Email or password can not be empty', });
+      if (handleSetAlertMessage) handleSetAlertMessage({ severity: 'warning', message: 'Email or password can not be empty', });
     }
 
-    setAlert(true);
+    if (toggleAlert) toggleAlert();
   }
 
   return (
@@ -87,8 +83,6 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
       <IconButton onClick={handleCloseLoginDialog} sx={{ position: 'absolute', right: '10px', top: '10px', }}>
         <Close fontSize='small' />
       </IconButton>
-      <CustomBackdrop backdropLoading={backdrop} />
-      <CustomSnackbar openAlert={alert} closeAlert={() => setAlert(false)} alertMessage={alertMessage.message} alertSeverity={alertMessage.severity} />
     </Dialog>
   );
 }
