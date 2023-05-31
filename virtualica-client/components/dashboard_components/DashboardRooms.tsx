@@ -29,7 +29,6 @@ const DashboardRooms = () => {
 
   useEffect(() => {
     if (selectedRoom !== '') {
-      console.log(selectedRoom);
       setRoom(roomList.filter((room) => room.roomId === selectedRoom)[0]);
     }
   }, [selectedRoom]);
@@ -72,11 +71,8 @@ const DashboardRooms = () => {
             </Box> :
             <List>
               {roomList.map((room, idx) => (
-                <Box key={idx} onClick={() => {
-                  handleChangeSelectedRoom && handleChangeSelectedRoom(room.roomId);
-                  console.log(roomList);
-                }}>
-                  <ListItemButton>
+                <Box key={idx} onClick={() => handleChangeSelectedRoom && handleChangeSelectedRoom(room.roomId)}>
+                  <ListItemButton className='item-button' selected={room.roomId === selectedRoom}>
                     <ListItemText
                       primary={<Typography sx={{ fontWeight: '600', }}>{room.roomName}</Typography>}
                       secondary={`Created at ${new Date(room.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', })}`}
