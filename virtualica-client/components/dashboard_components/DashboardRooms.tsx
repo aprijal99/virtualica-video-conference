@@ -21,9 +21,10 @@ import {
 import React, {useContext, useEffect, useState} from 'react';
 import CreateRoomDialog from '@/components/dashboard_components/CreateRoomDialog';
 import {RoomContext, RoomType} from '@/context/RoomProvider';
+import {ApiType} from '@/type/api';
 
 const DashboardRooms = () => {
-  const { roomList, selectedRoom, handleChangeSelectedRoom } = useContext(RoomContext);
+  const { roomList, selectedRoom, handleChangeSelectedRoom, handleChangeRoomStatus } = useContext(RoomContext);
   const [openCreateRoomDialog, setOpenCreateRoomDialog] = useState<boolean>(false);
   const [room, setRoom] = useState<RoomType | null>(null);
 
@@ -32,6 +33,22 @@ const DashboardRooms = () => {
       setRoom(roomList.filter((room) => room.roomId === selectedRoom)[0]);
     }
   }, [selectedRoom]);
+
+  const startOrStopRoom = async () => {
+    const fetchResult = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/room/${selectedRoom}/change-status`, {
+      method: 'PUT',
+    });
+    const apiResult: ApiType = await fetchResult.json();
+
+    if (apiResult.code === 200) {
+      if (handleChangeRoomStatus) handleChangeRoomStatus(selectedRoom);
+
+      if (room) {
+        const updatedRoom: RoomType = {...room, roomStatus: !room.roomStatus}
+        setRoom(updatedRoom);
+      }
+    }
+  }
 
   return (
     <Box
@@ -124,8 +141,9 @@ const DashboardRooms = () => {
                 variant='contained' size='small' color={room.roomStatus ? 'error' : 'primary'}
                 startIcon={room.roomStatus ? <StopOutlined /> : <PlayArrowOutlined />}
                 sx={{ textTransform: 'none', '.MuiButton-startIcon': { mr: .5, }, }}
+                onClick={startOrStopRoom}
               >
-                Start
+                {room.roomStatus ? 'Stop' : 'Start'}
               </Button>
               <Button variant='outlined' size='small' startIcon={<ContentCopy />} sx={{ textTransform: 'none', }}>Copy Invitation</Button>
               <Button variant='outlined' size='small' startIcon={<EditOutlined />} sx={{ textTransform: 'none', }}>Edit</Button>

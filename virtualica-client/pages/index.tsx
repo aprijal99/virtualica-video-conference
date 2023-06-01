@@ -8,6 +8,7 @@ import {FeedbackContext} from '../context/FeedbackProvider';
 import CustomBackdrop from '../components/feedback_components/CustomBackdrop';
 import CustomSnackbar from '../components/feedback_components/CustomSnackbar';
 import {GetServerSideProps} from 'next';
+import jwtDecode from 'jwt-decode';
 
 const Home = ({ isAuth }: { isAuth: boolean, }) => {
   const { backdrop, alert, alertMessage, toggleAlert } = useContext(FeedbackContext);
@@ -52,6 +53,16 @@ const Home = ({ isAuth }: { isAuth: boolean, }) => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const accessToken: string | undefined = ctx.req.cookies['access_token'];
   if (accessToken === undefined) {
+    return {
+      props: {
+        isAuth: false,
+      },
+    }
+  }
+
+  const decodedAccessToken: { sub: string, roles: string[], iss: string, exp: number, } = jwtDecode(accessToken);
+  const isValid: boolean = decodedAccessToken.exp > Date.now() / 1000;
+  if (!isValid) {
     return {
       props: {
         isAuth: false,

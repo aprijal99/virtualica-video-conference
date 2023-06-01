@@ -17,6 +17,7 @@ interface RoomContextProps {
   handleAddRoomList?: (roomList: RoomType[]) => void,
   handleRemoveRoom?: (roomId: string) => void,
   handleChangeSelectedRoom?: (roomId: string) => void,
+  handleChangeRoomStatus?: (roomId: string) => void,
 }
 
 const initialRoomContext: RoomContextProps = {
@@ -36,10 +37,24 @@ const RoomProvider = ({ children }: { children: ReactNode, }) => {
   const handleAddRoomList = (roomList: RoomType[]) => setRoomList(roomList);
   const handleRemoveRoom = (roomId: string) => setRoomList(prevState => prevState.filter((room) => room.roomId !== roomId));
   const handleChangeSelectedRoom = (roomId: string) => setSelectedRoom(roomId);
+  const handleChangeRoomStatus = (roomId: string) => {
+    const updatedRoomList: RoomType[] = roomList.map((room) => {
+      if (room.roomId === roomId) {
+        return {...room, roomStatus: !room.roomStatus}
+      }
+
+      return room;
+    });
+
+    setRoomList(updatedRoomList);
+  }
 
   return (
     <RoomContext.Provider
-      value={{ roomList, selectedRoom, handleGetRoomList, handleGetRoomDetail, handleAddRoom, handleAddRoomList, handleRemoveRoom, handleChangeSelectedRoom }}
+      value={{
+        roomList, selectedRoom, handleGetRoomList, handleGetRoomDetail, handleAddRoom,
+        handleAddRoomList, handleRemoveRoom, handleChangeSelectedRoom, handleChangeRoomStatus
+    }}
     >
       {children}
     </RoomContext.Provider>
