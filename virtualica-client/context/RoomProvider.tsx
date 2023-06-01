@@ -4,7 +4,8 @@ export type RoomType = {
   roomId: string,
   roomName: string,
   roomDescription: string,
-  createdAt: number
+  roomStatus: boolean,
+  createdAt: number,
 }
 
 interface RoomContextProps {

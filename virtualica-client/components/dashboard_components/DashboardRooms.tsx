@@ -14,7 +14,7 @@ import {
   ContentCopy,
   DeleteOutlined,
   EditOutlined, ExpandMore,
-  InfoOutlined, Link, PeopleOutlined, SendOutlined,
+  InfoOutlined, Link, PeopleOutlined, PlayArrowOutlined, SendOutlined, StopOutlined,
   VideoCallOutlined,
   VideocamOutlined
 } from '@mui/icons-material';
@@ -120,7 +120,13 @@ const DashboardRooms = () => {
             </Box>
 
             <Box display='flex' columnGap='10px' rowGap='10px' flexWrap='wrap' sx={{ my: 5, }}>
-              <Button variant='contained' size='small' sx={{ textTransform: 'none', }}>Start</Button>
+              <Button
+                variant='contained' size='small' color={room.roomStatus ? 'error' : 'primary'}
+                startIcon={room.roomStatus ? <StopOutlined /> : <PlayArrowOutlined />}
+                sx={{ textTransform: 'none', '.MuiButton-startIcon': { mr: .5, }, }}
+              >
+                Start
+              </Button>
               <Button variant='outlined' size='small' startIcon={<ContentCopy />} sx={{ textTransform: 'none', }}>Copy Invitation</Button>
               <Button variant='outlined' size='small' startIcon={<EditOutlined />} sx={{ textTransform: 'none', }}>Edit</Button>
               <Button variant='outlined' size='small' startIcon={<DeleteOutlined />} color='error' sx={{ textTransform: 'none', }}>Delete</Button>
