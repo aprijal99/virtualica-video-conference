@@ -4,7 +4,7 @@ import {grey} from '@mui/material/colors';
 import React, {useState} from 'react';
 import LoginDialog from '@/components/home_components/LoginDialog';
 
-const HomeNavBar = () => {
+const HomeNavBar = ({ isAuth }: { isAuth: boolean, }) => {
   const menu = ['About', 'GitHub'];
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement | undefined>(null);
   const openMenu = Boolean(anchorEl);
@@ -35,12 +35,20 @@ const HomeNavBar = () => {
         </Box>
 
         {/* LOGIN BUTTON */}
-        <Button
-          variant='outlined' size='small' onClick={() => setOpenLoginDialog(true)}
-          sx={{ textTransform: 'none', color: 'white', borderColor: 'white', ':hover': { borderColor: 'white', bgcolor: 'initial', }, }}
-        >
-          Login
-        </Button>
+        {isAuth ?
+          <Button
+            variant='outlined' size='small' href='/dashboard'
+            sx={{ textTransform: 'none', color: 'white', borderColor: 'white', ':hover': { borderColor: 'white', bgcolor: 'initial', }, }}
+          >
+            Dashboard
+          </Button> :
+          <Button
+            variant='outlined' size='small' onClick={() => setOpenLoginDialog(true)}
+            sx={{ textTransform: 'none', color: 'white', borderColor: 'white', ':hover': { borderColor: 'white', bgcolor: 'initial', }, }}
+          >
+            Login
+          </Button>
+        }
         <LoginDialog openLoginDialog={openLoginDialog} handleCloseLoginDialog={() => setOpenLoginDialog(false)} />
 
         {/* MOBILE MENU BUTTON*/}

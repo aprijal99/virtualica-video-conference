@@ -7,14 +7,15 @@ import {useContext} from 'react';
 import {FeedbackContext} from '../context/FeedbackProvider';
 import CustomBackdrop from '../components/feedback_components/CustomBackdrop';
 import CustomSnackbar from '../components/feedback_components/CustomSnackbar';
+import {GetServerSideProps} from 'next';
 
-const Home = () => {
+const Home = ({ isAuth }: { isAuth: boolean, }) => {
   const { backdrop, alert, alertMessage, toggleAlert } = useContext(FeedbackContext);
 
   return (
     <Box sx={{ maxWidth: '1000px', m: '0 auto', }}>
       {/* NAVBAR */}
-      <HomeNavBar />
+      <HomeNavBar isAuth={isAuth} />
 
       <Box
         sx={{
@@ -46,6 +47,23 @@ const Home = () => {
       <CustomSnackbar openAlert={alert} closeAlert={() => toggleAlert && toggleAlert()} alertMessage={alertMessage.message} alertSeverity={alertMessage.severity} />
     </Box>
   );
+}
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const accessToken: string | undefined = ctx.req.cookies['access_token'];
+  if (accessToken === undefined) {
+    return {
+      props: {
+        isAuth: false,
+      },
+    }
+  }
+
+  return {
+    props: {
+      isAuth: true,
+    },
+  }
 }
 
 export default Home;
