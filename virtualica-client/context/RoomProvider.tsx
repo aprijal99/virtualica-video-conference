@@ -4,7 +4,7 @@ export type RoomType = {
   roomId: string,
   roomName: string,
   roomDescription: string,
-  roomStatus: boolean,
+  roomStatus?: boolean,
   createdAt: number,
 }
 

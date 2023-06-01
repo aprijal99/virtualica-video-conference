@@ -22,9 +22,11 @@ import React, {useContext, useEffect, useState} from 'react';
 import CreateRoomDialog from '@/components/dashboard_components/CreateRoomDialog';
 import {RoomContext, RoomType} from '@/context/RoomProvider';
 import {ApiType} from '@/type/api';
+import {FeedbackContext} from '@/context/FeedbackProvider';
 
 const DashboardRooms = () => {
   const { roomList, selectedRoom, handleChangeSelectedRoom, handleChangeRoomStatus } = useContext(RoomContext);
+  const { toggleBackdrop } = useContext(FeedbackContext);
   const [openCreateRoomDialog, setOpenCreateRoomDialog] = useState<boolean>(false);
   const [room, setRoom] = useState<RoomType | null>(null);
 
@@ -35,6 +37,8 @@ const DashboardRooms = () => {
   }, [selectedRoom]);
 
   const startOrStopRoom = async () => {
+    if (toggleBackdrop) toggleBackdrop();
+
     const fetchResult = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/room/${selectedRoom}/change-status`, {
       method: 'PUT',
     });
@@ -48,6 +52,8 @@ const DashboardRooms = () => {
         setRoom(updatedRoom);
       }
     }
+
+    if (toggleBackdrop) toggleBackdrop();
   }
 
   return (
