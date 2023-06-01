@@ -25,7 +25,7 @@ public class SocketHandler extends TextWebSocketHandler {
         Map<String, Object> map = new ObjectMapper().readValue(textMessage.getPayload(), new TypeReference<>(){});
         String type = (String) map.get("type");
         String roomId = (String) map.get("roomId");
-        String senderEmail = (String) map.get("userEmail");
+        String senderEmail = (String) map.get("senderEmail");
 
         switch (type) {
             case "JOIN" -> sessionService.addSessionToRoom(webSocketSession, roomId, senderEmail);

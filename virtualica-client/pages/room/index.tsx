@@ -9,9 +9,36 @@ const OFFER: string = 'OFFER';
 const CANDIDATE: string = 'CANDIDATE';
 const ANSWER: string = 'ANSWER';
 
+type WsMessageType = {
+  type: 'JOIN' | 'REQUEST' | 'OFFER' | 'CANDIDATE' | 'ANSWER',
+  roomId: string,
+  senderEmail: string,
+  receiverEmail: string,
+  data?: RTCSessionDescription | RTCIceCandidate,
+}
+
 const Room = () => {
+  let socket: WebSocket | null = null;
+
   useEffect(() => {
-    const socket: WebSocket = new WebSocket('ws://localhost:7181/socket');
+    socket = new WebSocket('ws://localhost:7181/socket');
+
+    socket.onmessage = (ev) => {
+      const wsMessage: WsMessageType = JSON.parse(ev.data);
+
+      switch (wsMessage.type) {
+        case 'REQUEST':
+          break;
+        case 'OFFER':
+          break;
+        case 'CANDIDATE':
+          break;
+        case 'ANSWER':
+          break;
+        default:
+          break;
+      }
+    }
   }, []);
 
   return (
