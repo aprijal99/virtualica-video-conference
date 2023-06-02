@@ -7,8 +7,8 @@ import jwtDecode from 'jwt-decode';
 
 type WsMessageType = {
   type: 'JOIN' | 'REQUEST' | 'OFFER' | 'CANDIDATE' | 'ANSWER',
-  roomId: string,
-  senderEmail: string,
+  roomId?: string,
+  senderEmail?: string,
   receiverEmail?: string,
   data?: RTCSessionDescription | RTCIceCandidate,
 }
@@ -27,6 +27,9 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
       const wsMessage: WsMessageType = JSON.parse(ev.data);
 
       switch (wsMessage.type) {
+        case 'JOIN':
+          console.log('Ready to send a request');
+          break;
         case 'REQUEST':
           break;
         case 'OFFER':

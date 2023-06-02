@@ -1,5 +1,6 @@
 package virtualica.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -11,6 +12,7 @@ import java.util.Map;
 @Service
 public class SessionServiceImpl implements SessionService {
     private final Map<String, Map<String, WebSocketSession>> roomSessions = new HashMap<>();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void addRoom(String roomId) {
@@ -20,6 +22,15 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public void addSessionToRoom(WebSocketSession webSocketSession, String roomId, String userEmail) {
         roomSessions.get(roomId).put(userEmail, webSocketSession);
+
+        Map<String, String> joinResponse = new HashMap<>();
+        joinResponse.put("type", "JOIN");
+
+        try {
+            webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsBytes(joinResponse)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
