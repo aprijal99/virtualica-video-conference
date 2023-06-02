@@ -52,22 +52,18 @@ const Home = ({ isAuth }: { isAuth: boolean, }) => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const accessToken: string | undefined = ctx.req.cookies['access_token'];
-  if (accessToken === undefined) {
-    return {
-      props: {
-        isAuth: false,
-      },
-    }
+  if (accessToken === undefined) return {
+    props: {
+      isAuth: false,
+    },
   }
 
   const decodedAccessToken: { sub: string, roles: string[], iss: string, exp: number, } = jwtDecode(accessToken);
   const isValid: boolean = decodedAccessToken.exp > Date.now() / 1000;
-  if (!isValid) {
-    return {
-      props: {
-        isAuth: false,
-      },
-    }
+  if (!isValid) return {
+    props: {
+      isAuth: false,
+    },
   }
 
   return {

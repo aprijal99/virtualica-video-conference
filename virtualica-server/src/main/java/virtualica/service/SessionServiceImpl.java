@@ -19,7 +19,7 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public void addSessionToRoom(WebSocketSession webSocketSession, String roomId, String userEmail) {
-        roomSessions.get("roomId").put(userEmail, webSocketSession);
+        roomSessions.get(roomId).put(userEmail, webSocketSession);
     }
 
     @Override
