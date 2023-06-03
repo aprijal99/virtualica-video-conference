@@ -1,7 +1,7 @@
 import {Box} from '@mui/material';
 import RoomNavBar from '@/components/room_components/RoomNavBar';
 import VideoContainer from '@/components/room_components/VideoContainer';
-import {useEffect} from 'react';
+import {createElement, useEffect, useState} from 'react';
 import {GetServerSideProps} from 'next';
 import jwtDecode from 'jwt-decode';
 
@@ -19,7 +19,22 @@ interface RoomPageProps {
   roomId: string,
 }
 
+const peerConnectionConfig: RTCConfiguration = {
+  iceServers: [
+    {'urls': 'stun:stun.stunprotocol.org:3478'},
+    {'urls': 'stun:stun.l.google.com:19302'},
+  ],
+}
+
 const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
+  const [peerConnections, setPeerConnections] = useState<Map<string, RTCPeerConnection>>(new Map());
+  const [people, setPeople] = useState<string[]>([]);
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [remoteStream, setRemoteStream] = useState<Map<string, MediaStream>>(new Map());
+
+  useEffect(() => console.log(peerConnections), [peerConnections]);
+  useEffect(() => console.log(people), [people]);
+
   useEffect(() => {
     const socket: WebSocket = new WebSocket('ws://localhost:7181/socket');
 
@@ -28,7 +43,7 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
 
       switch (wsMessage.type) {
         case 'JOIN':
-          console.log('Ready to send a request');
+          // handleJoin();
           break;
         case 'REQUEST':
           break;
@@ -44,8 +59,27 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
     }
 
     socket.onopen = () => {
-      const joinMessage: WsMessageType = { type: 'JOIN', roomId, senderEmail: userEmail, }
-      socket.send(JSON.stringify(joinMessage));
+      sendToSignalingServer({ type: 'JOIN', roomId, senderEmail: userEmail, });
+
+      if (people.length === 0) setPeople([userEmail, userEmail]);
+
+      navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
+        .then((mediaStream) => {
+          setLocalStream(mediaStream);
+        });
+    }
+
+    const sendToSignalingServer = (message: WsMessageType) => socket.send(JSON.stringify(message));
+
+    const handleJoin = () => {
+      const localPeerConnection = new RTCPeerConnection(peerConnectionConfig);
+      localPeerConnection.onicecandidate = (ev) => {
+        if (ev.candidate) sendToSignalingServer({ type: 'REQUEST', roomId, senderEmail: userEmail, });
+      }
+
+      const newPeerConnections = new Map<string, RTCPeerConnection>(peerConnections);
+      newPeerConnections.set(userEmail, new RTCPeerConnection(peerConnectionConfig));
+      setPeerConnections(newPeerConnections);
     }
   }, []);
 
@@ -53,7 +87,7 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
     isAuth ?
       <Box display='flex' flexDirection='column' sx={{ height: '100vh', mx: 2, }}>
         {/* VIDEO */}
-        <VideoContainer />
+        <VideoContainer people={people} localStream={localStream} />
 
         {/* NAVIGATION */}
         <RoomNavBar />

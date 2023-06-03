@@ -1,19 +1,28 @@
 import {Avatar, Box, Typography} from '@mui/material';
 import {grey} from '@mui/material/colors';
 import {MicOffOutlined} from '@mui/icons-material';
-import nameToColor from '@/functions/nameToColor';
-import {useEffect, useRef, useState} from 'react';
+import {createRef, useEffect, useRef, useState} from 'react';
 
-const Video = ({ name }: { name: string, }) => {
+const Video = ({ name, localStream }: { name: string, localStream: MediaStream | null, }) => {
+  const videoRef = createRef<HTMLVideoElement>();
+
+  useEffect(() => {
+    if (localStream && videoRef.current) {
+      videoRef.current.srcObject = localStream;
+      videoRef.current.addEventListener('loadedmetadata', () => videoRef.current?.play());
+    }
+  }, [localStream]);
+
   return (
     <Box
-      display='flex' alignItems='center' justifyContent='center' flexGrow='1'
-      sx={{ bgcolor: grey['800'], borderRadius: '10px', position: 'relative', }}
+      id={name} display='flex' alignItems='center' justifyContent='center' flexGrow='1'
+      sx={{ bgcolor: grey['800'], borderRadius: '10px', position: 'relative', overflow: 'hidden', }}
     >
-      <Avatar
-        sx={{ height: '60px', width: '60px', bgcolor: nameToColor('Aprijal Ghiyas Setiawan'), }}
-        children={<Typography sx={{ color: 'white', fontSize: '25px', }}>AG</Typography>}
-      />
+      {/*<Avatar*/}
+      {/*  sx={{ height: '60px', width: '60px', bgcolor: nameToColor('Aprijal Ghiyas Setiawan'), }}*/}
+      {/*  children={<Typography sx={{ color: 'white', fontSize: '25px', }}>AG</Typography>}*/}
+      {/*/>*/}
+      <Box sx={{ height: '100%', width: '100%', bgcolor: 'red', }}><video ref={videoRef} /></Box>
       <Typography
         sx={{
           fontSize: '15px', position: 'absolute', bottom: '10px', left: '10px', maxWidth: '75%',
@@ -29,17 +38,13 @@ const Video = ({ name }: { name: string, }) => {
   );
 }
 
-const VideoContainer = () => {
+const VideoContainer = ({ people, localStream }: { people: string[], localStream: MediaStream | null, }) => {
   const [videos, setVideos] = useState<string[] | null>(null);
   const [videosRestriction, setVideosRestriction] = useState<{ renderedVideos: string[], maxRowNum: number, maxColNum: number, } | null>(null);
   const [widthHeight, setWidthHeight] = useState<{ width: number, height: number} | null>(null);
   const videosWrapperRef = useRef<HTMLDivElement>();
 
-  useEffect(() => {
-    setVideos([
-      `user-${Math.floor(Math.random() * 100)}`, `user-${Math.floor(Math.random() * 100)}`,
-    ]);
-  }, []);
+  useEffect(() => setVideos(people), [people]);
 
   useEffect(() => {
     let wrapperWidth: number | undefined = videosWrapperRef.current?.offsetWidth;
@@ -142,7 +147,7 @@ const VideoContainer = () => {
       <Box sx={{ height: '100%', display: 'grid', gridTemplateRows: `repeat(${rowNum}, 1fr)`, rowGap: '10px', }}>
         {groupVideos.map((videos, idx) => (
           <Box key={idx} display='flex' columnGap='10px'>
-            {videos.map((val, idx) => <Video key={idx} name={val} />)}
+            {videos.map((val, idx) => <Video key={idx} name={val} localStream={localStream} />)}
           </Box>
         ))}
       </Box>
