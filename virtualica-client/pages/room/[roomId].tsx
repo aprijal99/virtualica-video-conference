@@ -28,9 +28,7 @@ const peerConnectionConfig: RTCConfiguration = {
 
 const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
   const [peerConnections, setPeerConnections] = useState<Map<string, RTCPeerConnection>>(new Map());
-  const [people, setPeople] = useState<string[]>([]);
-  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const [remoteStream, setRemoteStream] = useState<Map<string, MediaStream>>(new Map());
+  const [videoStream, setVideoStream] = useState<Map<string, MediaStream | null>>(new Map());
 
   useEffect(() => console.log(peerConnections), [peerConnections]);
 
@@ -60,10 +58,10 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
     socket.onopen = () => {
       sendToSignalingServer({ type: 'JOIN', roomId, senderEmail: userEmail, });
 
-      if (people.length === 0) setPeople([userEmail]);
-
       navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
-        .then((mediaStream) => setLocalStream(mediaStream));
+        .then((mediaStream) => {
+          setVideoStream(new Map(videoStream.set(userEmail, mediaStream)));
+        });
     }
 
     const sendToSignalingServer = (message: WsMessageType) => socket.send(JSON.stringify(message));
@@ -86,7 +84,7 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
     isAuth ?
       <Box display='flex' flexDirection='column' sx={{ height: '100vh', mx: 2, }}>
         {/* VIDEO */}
-        <VideoContainer people={people} localStream={localStream} />
+        <VideoContainer videoStream={videoStream} />
 
         {/* NAVIGATION */}
         <RoomNavBar />

@@ -3,15 +3,15 @@ import {grey} from '@mui/material/colors';
 import {MicOffOutlined} from '@mui/icons-material';
 import {createRef, useEffect, useRef, useState} from 'react';
 
-const Video = ({ name, localStream }: { name: string, localStream: MediaStream | null, }) => {
+const Video = ({ name, stream }: { name: string, stream: MediaStream | null }) => {
   const videoRef = createRef<HTMLVideoElement>();
 
   useEffect(() => {
-    if (localStream && videoRef.current) {
-      videoRef.current.srcObject = localStream;
+    if (stream && videoRef.current) {
+      videoRef.current.srcObject = stream;
       videoRef.current.addEventListener('loadedmetadata', () => videoRef.current?.play());
     }
-  }, [localStream]);
+  }, [stream]);
 
   return (
     <Box
@@ -38,13 +38,13 @@ const Video = ({ name, localStream }: { name: string, localStream: MediaStream |
   );
 }
 
-const VideoContainer = ({ people, localStream }: { people: string[], localStream: MediaStream | null, }) => {
-  const [videos, setVideos] = useState<string[] | null>(null);
-  const [videosRestriction, setVideosRestriction] = useState<{ renderedVideos: string[], maxRowNum: number, maxColNum: number, } | null>(null);
+const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream | null>, }) => {
+  const [videos, setVideos] = useState<Map<string, MediaStream | null> | null>(null);
+  const [videosRestriction, setVideosRestriction] = useState<{ renderedVideos: Map<string, MediaStream | null>, maxRowNum: number, maxColNum: number, } | null>(null);
   const [widthHeight, setWidthHeight] = useState<{ width: number, height: number} | null>(null);
   const videosWrapperRef = useRef<HTMLDivElement>();
 
-  useEffect(() => setVideos(people), [people]);
+  useEffect(() => setVideos(videoStream), [videoStream]);
 
   useEffect(() => {
     let wrapperWidth: number | undefined = videosWrapperRef.current?.offsetWidth;
@@ -75,6 +75,12 @@ const VideoContainer = ({ people, localStream }: { people: string[], localStream
     }
   }, []);
 
+  const addVideo = () => {
+    const newVideos = new Map(videos);
+    newVideos.set(`user-${Math.floor(Math.random() * 100)}`, null)
+    setVideos(newVideos);
+  }
+
   const handleSetVideosRestriction = (wrapperWidth: number, wrapperHeight: number) => {
     if (videos) {
       let cellMinWidth = 160;
@@ -88,49 +94,41 @@ const VideoContainer = ({ people, localStream }: { people: string[], localStream
       const maxRowNum = Math.floor(wrapperHeight / cellMinHeight);
       const maxColNum = Math.floor(wrapperWidth / cellMinWidth);
       const maxVideoNum = maxRowNum * maxColNum;
-      const renderedVideos = videos.slice(0, maxVideoNum);
+      const renderedVideos = new Map(Array.from(videos).slice(0, maxVideoNum));
 
       setVideosRestriction({ renderedVideos, maxRowNum, maxColNum, });
     }
   }
 
-  const addVideo = () => setVideos(prevState => {
-    if (prevState === null) {
-      return [`user-${Math.floor(Math.random() * 100)}`];
-    } else {
-      return [...prevState, `user-${Math.floor(Math.random() * 100)}`];
-    }
-  })
-
-  const renderVideos = (videosRestriction: { renderedVideos: string[], maxRowNum: number, maxColNum: number, }) => {
+  const renderVideos = (videosRestriction: { renderedVideos: Map<string, MediaStream | null>, maxRowNum: number, maxColNum: number, }) => {
     const { renderedVideos, maxRowNum, maxColNum} = videosRestriction;
     const gridMap = [];
 
     if (window.innerHeight > window.innerWidth) {
       let y = 0;
       while (true) {
-        if (gridMap.length === renderedVideos.length) break;
+        if (gridMap.length === renderedVideos.size) break;
         for (let x = 0; x <= y; x++) {
-          if (gridMap.length === renderedVideos.length) break;
+          if (gridMap.length === renderedVideos.size) break;
           if ((x < maxColNum) && (y < maxRowNum)) gridMap.push([x, y]);
-          if (gridMap.length === renderedVideos.length) break;
+          if (gridMap.length === renderedVideos.size) break;
           if (x === y) continue;
           if (y < maxColNum) gridMap.push([y, x]);
-          if (gridMap.length === renderedVideos.length) break;
+          if (gridMap.length === renderedVideos.size) break;
         }
         y++;
       }
     } else {
       let x = 0;
       while (true) {
-        if (gridMap.length === renderedVideos.length) break;
+        if (gridMap.length === renderedVideos.size) break;
         for (let y = 0; y <= x; y++) {
-          if (gridMap.length === renderedVideos.length) break;
+          if (gridMap.length === renderedVideos.size) break;
           if ((y < maxRowNum) && (x < maxColNum)) gridMap.push([x, y]);
-          if (gridMap.length === renderedVideos.length) break;
+          if (gridMap.length === renderedVideos.size) break;
           if (y === x) continue;
           if (x < maxRowNum) gridMap.push([y, x]);
-          if (gridMap.length === renderedVideos.length) break;
+          if (gridMap.length === renderedVideos.size) break;
         }
         x++;
       }
@@ -139,15 +137,26 @@ const VideoContainer = ({ people, localStream }: { people: string[], localStream
     let rowNum = 1;
     gridMap.map(val => rowNum = (val[1] + 1) > rowNum ? val[1] + 1 : rowNum);
 
-    const groupVideos: string[][] = [];
+    const groupVideos: Map<string, MediaStream | null>[][] = [];
     for (let i = 0; i < rowNum; i++) groupVideos.push([]);
-    for (let j = 0; j < renderedVideos.length; j++) groupVideos[gridMap[j][1]].push(renderedVideos[j]);
+
+    const keys: string[] = Array.from(renderedVideos.keys());
+    for (let j = 0; j < renderedVideos.size; j++) {
+      const itemKey: string = keys[j];
+      const itemVal = renderedVideos.get(itemKey) as MediaStream | null;
+      const item = new Map<string, MediaStream | null>();
+      item.set(itemKey, itemVal);
+      groupVideos[gridMap[j][1]].push(item);
+    }
 
     return (
       <Box sx={{ height: '100%', display: 'grid', gridTemplateRows: `repeat(${rowNum}, 1fr)`, rowGap: '10px', }}>
         {groupVideos.map((videos, idx) => (
           <Box key={idx} display='flex' columnGap='10px' >
-            {videos.map((val, idx) => <Video key={idx} name={val} localStream={localStream} />)}
+            {videos.map((val, idx) => {
+              const itemKey: string = Array.from(val.keys())[0];
+              return <Video key={idx} name={itemKey} stream={val.get(itemKey) as MediaStream | null} />
+            })}
           </Box>
         ))}
       </Box>
