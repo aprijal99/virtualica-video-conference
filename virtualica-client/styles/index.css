@@ -1,6 +1,4 @@
 video {
-  height: 100%;
-  width: 100%;
   object-fit: cover;
   transform: scaleX(-1);
   -webkit-transform: scaleX(-1);
@@ -76,8 +74,3 @@ video {
   margin: 12px 0 12px 10px;
 }
 
-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}

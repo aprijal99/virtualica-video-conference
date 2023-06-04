@@ -1,4 +1,4 @@
-import '@/styles/globals.css'
+import '@/styles/index.css'
 import type { AppProps } from 'next/app'
 import createEmotionCache from '@/functions/createEmotionCache';
 import {EmotionCache} from '@emotion/css';

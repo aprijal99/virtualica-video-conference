@@ -1,7 +1,7 @@
 import {Box} from '@mui/material';
 import RoomNavBar from '@/components/room_components/RoomNavBar';
 import VideoContainer from '@/components/room_components/VideoContainer';
-import {createElement, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {GetServerSideProps} from 'next';
 import jwtDecode from 'jwt-decode';
 
@@ -10,7 +10,7 @@ type WsMessageType = {
   roomId?: string,
   senderEmail?: string,
   receiverEmail?: string,
-  data?: RTCSessionDescription | RTCIceCandidate,
+  data?: RTCSessionDescription | RTCIceCandidate | string[],
 }
 
 interface RoomPageProps {
@@ -33,7 +33,6 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
   const [remoteStream, setRemoteStream] = useState<Map<string, MediaStream>>(new Map());
 
   useEffect(() => console.log(peerConnections), [peerConnections]);
-  useEffect(() => console.log(people), [people]);
 
   useEffect(() => {
     const socket: WebSocket = new WebSocket('ws://localhost:7181/socket');
@@ -43,7 +42,7 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
 
       switch (wsMessage.type) {
         case 'JOIN':
-          // handleJoin();
+          handleJoin(wsMessage.data as string[]);
           break;
         case 'REQUEST':
           break;
@@ -61,25 +60,25 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
     socket.onopen = () => {
       sendToSignalingServer({ type: 'JOIN', roomId, senderEmail: userEmail, });
 
-      if (people.length === 0) setPeople([userEmail, userEmail]);
+      if (people.length === 0) setPeople([userEmail]);
 
       navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
-        .then((mediaStream) => {
-          setLocalStream(mediaStream);
-        });
+        .then((mediaStream) => setLocalStream(mediaStream));
     }
 
     const sendToSignalingServer = (message: WsMessageType) => socket.send(JSON.stringify(message));
 
-    const handleJoin = () => {
-      const localPeerConnection = new RTCPeerConnection(peerConnectionConfig);
-      localPeerConnection.onicecandidate = (ev) => {
-        if (ev.candidate) sendToSignalingServer({ type: 'REQUEST', roomId, senderEmail: userEmail, });
-      }
+    const handleJoin = (peopleArr: string[]) => {
+      if (peopleArr.length > 1) {
+        const localPeerConnection = new RTCPeerConnection(peerConnectionConfig);
+        localPeerConnection.onicecandidate = (ev) => {
+          if (ev.candidate) sendToSignalingServer({ type: 'REQUEST', roomId, senderEmail: userEmail, });
+        }
 
-      const newPeerConnections = new Map<string, RTCPeerConnection>(peerConnections);
-      newPeerConnections.set(userEmail, new RTCPeerConnection(peerConnectionConfig));
-      setPeerConnections(newPeerConnections);
+        const newPeerConnections = new Map<string, RTCPeerConnection>(peerConnections);
+        newPeerConnections.set(userEmail, new RTCPeerConnection(peerConnectionConfig));
+        setPeerConnections(newPeerConnections);
+      }
     }
   }, []);
 

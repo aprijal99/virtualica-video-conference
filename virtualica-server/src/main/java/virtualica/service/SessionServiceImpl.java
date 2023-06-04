@@ -23,8 +23,9 @@ public class SessionServiceImpl implements SessionService {
     public void addSessionToRoom(WebSocketSession webSocketSession, String roomId, String userEmail) {
         roomSessions.get(roomId).put(userEmail, webSocketSession);
 
-        Map<String, String> joinResponse = new HashMap<>();
+        Map<String, Object> joinResponse = new HashMap<>();
         joinResponse.put("type", "JOIN");
+        joinResponse.put("data", roomSessions.get(roomId).keySet());
 
         try {
             webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsBytes(joinResponse)));

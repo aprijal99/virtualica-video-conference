@@ -15,14 +15,14 @@ const Video = ({ name, localStream }: { name: string, localStream: MediaStream |
 
   return (
     <Box
-      id={name} display='flex' alignItems='center' justifyContent='center' flexGrow='1'
+      id={name} display='flex' flexGrow='1'
       sx={{ bgcolor: grey['800'], borderRadius: '10px', position: 'relative', overflow: 'hidden', }}
     >
       {/*<Avatar*/}
       {/*  sx={{ height: '60px', width: '60px', bgcolor: nameToColor('Aprijal Ghiyas Setiawan'), }}*/}
       {/*  children={<Typography sx={{ color: 'white', fontSize: '25px', }}>AG</Typography>}*/}
       {/*/>*/}
-      <Box sx={{ height: '100%', width: '100%', bgcolor: 'red', }}><video ref={videoRef} /></Box>
+      <video ref={videoRef} style={{ position: 'absolute', width: '100%', height: '100%', }} />
       <Typography
         sx={{
           fontSize: '15px', position: 'absolute', bottom: '10px', left: '10px', maxWidth: '75%',
@@ -146,7 +146,7 @@ const VideoContainer = ({ people, localStream }: { people: string[], localStream
     return (
       <Box sx={{ height: '100%', display: 'grid', gridTemplateRows: `repeat(${rowNum}, 1fr)`, rowGap: '10px', }}>
         {groupVideos.map((videos, idx) => (
-          <Box key={idx} display='flex' columnGap='10px'>
+          <Box key={idx} display='flex' columnGap='10px' >
             {videos.map((val, idx) => <Video key={idx} name={val} localStream={localStream} />)}
           </Box>
         ))}
@@ -155,7 +155,7 @@ const VideoContainer = ({ people, localStream }: { people: string[], localStream
   }
 
   return (
-    <Box display='flex' flexDirection='column' flexGrow='1' sx={{ mt: 2, }} onClick={addVideo}>
+    <Box display='flex' flexDirection='column' flexGrow='1' sx={{ mt: 2, overflow: 'hidden', }} onClick={addVideo}>
       <Typography sx={{ mb: 2, '@media (min-width: 600px)': { display: 'none', }, }}>Team Meeting</Typography>
       <Box ref={videosWrapperRef} display='flex' flexGrow='1' flexDirection='column' sx={{ overflow: 'hidden', }}>
         {videosRestriction && renderVideos(videosRestriction)}
