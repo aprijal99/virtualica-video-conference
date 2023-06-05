@@ -52,6 +52,7 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
           handleOffer(wsMessage.senderEmail as string, wsMessage.data as RTCSessionDescription);
           break;
         case 'ANSWER':
+          handleAnswer(wsMessage.senderEmail as string, wsMessage.data as RTCSessionDescription);
           break;
         default:
           break;
@@ -119,6 +120,10 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
         .then(() => peerConnections.get(senderEmail)!.createAnswer())
         .then((answer) => peerConnections.get(senderEmail)!.setLocalDescription(answer))
         .then(() => sendToSignalingServer({ type: 'ANSWER', roomId, senderEmail: userEmail, receiverEmail: senderEmail, data: peerConnections.get(senderEmail)!.localDescription as RTCSessionDescription}));
+    }
+
+    const handleAnswer = (senderEmail: string, answer: RTCSessionDescription) => {
+      peerConnections.get(senderEmail)!.setRemoteDescription(answer);
     }
   }, []);
 
