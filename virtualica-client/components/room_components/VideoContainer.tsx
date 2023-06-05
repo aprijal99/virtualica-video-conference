@@ -39,12 +39,9 @@ const Video = ({ name, stream }: { name: string, stream: MediaStream | null }) =
 }
 
 const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream | null>, }) => {
-  const [videos, setVideos] = useState<Map<string, MediaStream | null> | null>(null);
   const [videosRestriction, setVideosRestriction] = useState<{ renderedVideos: Map<string, MediaStream | null>, maxRowNum: number, maxColNum: number, } | null>(null);
   const [widthHeight, setWidthHeight] = useState<{ width: number, height: number} | null>(null);
   const videosWrapperRef = useRef<HTMLDivElement>();
-
-  useEffect(() => setVideos(videoStream), [videoStream]);
 
   useEffect(() => {
     let wrapperWidth: number | undefined = videosWrapperRef.current?.offsetWidth;
@@ -55,7 +52,7 @@ const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream 
     } else {
       handleSetVideosRestriction(wrapperWidth as number, wrapperHeight as number);
     }
-  }, [videos, widthHeight]);
+  }, [videoStream, widthHeight]);
 
   useEffect(() => {
     if (videosWrapperRef.current) {
@@ -75,14 +72,8 @@ const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream 
     }
   }, []);
 
-  const addVideo = () => {
-    const newVideos = new Map(videos);
-    newVideos.set(`user-${Math.floor(Math.random() * 100)}`, null)
-    setVideos(newVideos);
-  }
-
   const handleSetVideosRestriction = (wrapperWidth: number, wrapperHeight: number) => {
-    if (videos) {
+    if (videoStream) {
       let cellMinWidth = 160;
       let cellMinHeight = 180;
 
@@ -94,7 +85,7 @@ const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream 
       const maxRowNum = Math.floor(wrapperHeight / cellMinHeight);
       const maxColNum = Math.floor(wrapperWidth / cellMinWidth);
       const maxVideoNum = maxRowNum * maxColNum;
-      const renderedVideos = new Map(Array.from(videos).slice(0, maxVideoNum));
+      const renderedVideos = new Map(Array.from(videoStream).slice(0, maxVideoNum));
 
       setVideosRestriction({ renderedVideos, maxRowNum, maxColNum, });
     }
@@ -164,7 +155,7 @@ const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream 
   }
 
   return (
-    <Box display='flex' flexDirection='column' flexGrow='1' sx={{ mt: 2, overflow: 'hidden', }} onClick={addVideo}>
+    <Box display='flex' flexDirection='column' flexGrow='1' sx={{ mt: 2, overflow: 'hidden', }}>
       <Typography sx={{ mb: 2, '@media (min-width: 600px)': { display: 'none', }, }}>Team Meeting</Typography>
       <Box ref={videosWrapperRef} display='flex' flexGrow='1' flexDirection='column' sx={{ overflow: 'hidden', }}>
         {videosRestriction && renderVideos(videosRestriction)}

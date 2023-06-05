@@ -43,6 +43,7 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
           handleJoin(wsMessage.data as string[]);
           break;
         case 'REQUEST':
+          handleRequest(wsMessage.senderEmail as string);
           break;
         case 'OFFER':
           break;
@@ -68,15 +69,24 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
 
     const handleJoin = (peopleArr: string[]) => {
       if (peopleArr.length > 1) {
-        const localPeerConnection = new RTCPeerConnection(peerConnectionConfig);
-        localPeerConnection.onicecandidate = (ev) => {
-          if (ev.candidate) sendToSignalingServer({ type: 'REQUEST', roomId, senderEmail: userEmail, });
+        for (let i = 0; i < peopleArr.length; i++) {
+          if (peopleArr[i] === userEmail) continue;
+
+          setVideoStream(new Map(videoStream.set(peopleArr[i], null)));
+
+          const newPeerConnection = new RTCPeerConnection(peerConnectionConfig);
+          newPeerConnection.ontrack = (ev) => {
+            videoStream.set(peopleArr[i], ev.streams[0]);
+          }
+          setPeerConnections(new Map(peerConnections.set(peopleArr[i], newPeerConnection)));
         }
 
-        const newPeerConnections = new Map<string, RTCPeerConnection>(peerConnections);
-        newPeerConnections.set(userEmail, new RTCPeerConnection(peerConnectionConfig));
-        setPeerConnections(newPeerConnections);
+        sendToSignalingServer({ type: 'REQUEST', roomId, senderEmail: userEmail, });
       }
+    }
+
+    const handleRequest = (senderEmail: string) => {
+
     }
   }, []);
 
