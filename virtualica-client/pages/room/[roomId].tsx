@@ -86,7 +86,26 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
     }
 
     const handleRequest = (senderEmail: string) => {
+      setVideoStream(new Map(videoStream.set(senderEmail, null)));
 
+      const newPeerConnection = new RTCPeerConnection(peerConnectionConfig);
+      newPeerConnection.onicecandidate = (ev) => {
+        if (ev.candidate) {
+          sendToSignalingServer({ type: 'CANDIDATE', roomId, senderEmail: userEmail, receiverEmail: senderEmail, data: ev.candidate as RTCIceCandidate, });
+        }
+      }
+
+      newPeerConnection.ontrack = (ev) => {
+        videoStream.set(senderEmail, ev.streams[0])
+      }
+
+      newPeerConnection.onnegotiationneeded = () => {
+        newPeerConnection.createOffer()
+          .then((offer) => newPeerConnection.setLocalDescription(offer))
+          .then(() => sendToSignalingServer({ type: 'OFFER', roomId, senderEmail: userEmail, receiverEmail: senderEmail, data: newPeerConnection.localDescription as RTCSessionDescription, }));
+      }
+
+      setPeerConnections(new Map(peerConnections.set(senderEmail, newPeerConnection)));
     }
   }, []);
 
