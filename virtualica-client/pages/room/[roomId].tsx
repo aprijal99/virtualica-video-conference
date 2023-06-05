@@ -45,9 +45,10 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
         case 'REQUEST':
           handleRequest(wsMessage.senderEmail as string);
           break;
-        case 'OFFER':
-          break;
         case 'CANDIDATE':
+          handleCandidate(wsMessage.senderEmail as string, wsMessage.data as RTCIceCandidate);
+          break;
+        case 'OFFER':
           break;
         case 'ANSWER':
           break;
@@ -106,6 +107,10 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
       }
 
       setPeerConnections(new Map(peerConnections.set(senderEmail, newPeerConnection)));
+    }
+
+    const handleCandidate = (senderEmail: string, candidate: RTCIceCandidate) => {
+      peerConnections.get(senderEmail)!.addIceCandidate(new RTCIceCandidate(candidate));
     }
   }, []);
 
