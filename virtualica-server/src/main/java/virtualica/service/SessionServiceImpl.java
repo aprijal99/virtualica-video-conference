@@ -7,11 +7,13 @@ import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class SessionServiceImpl implements SessionService {
     private final Map<String, Map<String, WebSocketSession>> roomSessions = new HashMap<>();
+    private final Map<String, List<String>> sessionInfo = new HashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -22,6 +24,7 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public void addSessionToRoom(WebSocketSession webSocketSession, String roomId, String userEmail) {
         roomSessions.get(roomId).put(userEmail, webSocketSession);
+        sessionInfo.put(webSocketSession.getId(), List.of(roomId, userEmail));
 
         Map<String, Object> joinResponse = new HashMap<>();
         joinResponse.put("type", "JOIN");
@@ -36,7 +39,7 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public Map<String, WebSocketSession> getRoomSessions(String roomId) {
-        return roomSessions.get("roomId");
+        return roomSessions.get(roomId);
     }
 
     @Override
@@ -62,8 +65,15 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public void deleteSession(String roomId, String userEmail) {
-        roomSessions.get(roomId).remove(userEmail);
+    public void deleteSession(WebSocketSession webSocketSession) {
+        List<String> roomIdAndUserEmail = sessionInfo.get(webSocketSession.getId());
+
+        if (roomIdAndUserEmail != null) {
+            String roomId = roomIdAndUserEmail.get(0);
+            String userEmail = roomIdAndUserEmail.get(1);
+
+            roomSessions.get(roomId).remove(userEmail);
+        }
     }
 
     @Override

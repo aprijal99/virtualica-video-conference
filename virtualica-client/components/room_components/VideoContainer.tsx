@@ -38,8 +38,8 @@ const Video = ({ name, stream }: { name: string, stream: MediaStream | null }) =
   );
 }
 
-const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream | null>, }) => {
-  const [videosRestriction, setVideosRestriction] = useState<{ renderedVideos: Map<string, MediaStream | null>, maxRowNum: number, maxColNum: number, } | null>(null);
+const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream>, }) => {
+  const [videosRestriction, setVideosRestriction] = useState<{ renderedVideos: Map<string, MediaStream>, maxRowNum: number, maxColNum: number, } | null>(null);
   const [widthHeight, setWidthHeight] = useState<{ width: number, height: number} | null>(null);
   const videosWrapperRef = useRef<HTMLDivElement>();
 

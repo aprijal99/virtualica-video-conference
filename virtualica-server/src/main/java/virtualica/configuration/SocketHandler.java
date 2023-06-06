@@ -36,4 +36,9 @@ public class SocketHandler extends TextWebSocketHandler {
             }
         }
     }
+
+    @Override
+    public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus status) {
+        sessionService.deleteSession(webSocketSession);
+    }
 }
