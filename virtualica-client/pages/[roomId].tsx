@@ -53,6 +53,11 @@ const RoomId = ({ roomId }: RoomIdProps) => {
     }
 
     conn.onopen = () => {
+      navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
+        .then((mediaStream) => {
+          setVideoStream(new Map(videoStream.set('local', mediaStream)));
+        });
+
       peerConnection = new RTCPeerConnection(peerConnectionConfig);
 
       peerConnection.ontrack = (ev) => {
@@ -87,8 +92,6 @@ const RoomId = ({ roomId }: RoomIdProps) => {
 
       navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
         .then((mediaStream) => {
-          setVideoStream(new Map(videoStream.set('local', mediaStream)));
-
           mediaStream.getTracks().forEach((mediaStreamTrack) => {
             peerConnection.addTrack(mediaStreamTrack, mediaStream);
           });
@@ -103,8 +106,6 @@ const RoomId = ({ roomId }: RoomIdProps) => {
       peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
         .then(() => navigator.mediaDevices.getUserMedia({ audio: true, video: true, }))
         .then((mediaStream) => {
-          setVideoStream(new Map(videoStream.set('local', mediaStream)));
-
           mediaStream.getTracks().forEach((mediaStreamTrack) => {
             peerConnection.addTrack(mediaStreamTrack, mediaStream);
           });
