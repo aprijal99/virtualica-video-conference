@@ -24,7 +24,6 @@ const RoomId = ({ roomId }: RoomIdProps) => {
   let conn: WebSocket;
   let peerConnection: RTCPeerConnection;
   const [videoStream, setVideoStream] = useState<Map<string, MediaStream>>(new Map());
-  const [localVideoStream, setLocalVideoStream] = useState<MediaStream | null>(null);
 
   useEffect(() => {
     conn = new WebSocket('ws://localhost:7181/socket');
