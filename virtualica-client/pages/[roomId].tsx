@@ -18,7 +18,7 @@ const ANSWER: string = 'ANSWER';
 const CANDIDATE: string = 'CANDIDATE';
 const JOINT: string = 'JOIN';
 
-export default function Tmp() {
+const RoomId = () => {
   let conn: WebSocket;
   let peerConnection: RTCPeerConnection;
   const [videoStream, setVideoStream] = useState<Map<string, MediaStream>>(new Map());
@@ -151,3 +151,5 @@ const Video = ({ mediaStream }: { mediaStream: MediaStream, }) => {
     <div ref={videoContainerRef}></div>
   )
 }
+
+export default RoomId;
