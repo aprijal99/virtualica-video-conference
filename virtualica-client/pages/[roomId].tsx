@@ -3,7 +3,7 @@ import {createRef, useEffect, useState} from 'react';
 import {GetServerSideProps} from 'next';
 
 type MessageType = {
-  event: string,
+  event: 'JOIN' | 'CANDIDATE' | 'OFFER' | 'ANSWER',
   data?: RTCSessionDescription | RTCIceCandidate,
 }
 
@@ -20,17 +20,11 @@ interface RoomIdProps {
   roomId: string,
 }
 
-const OFFER: string = 'OFFER';
-const ANSWER: string = 'ANSWER';
-const CANDIDATE: string = 'CANDIDATE';
-const JOINT: string = 'JOIN';
-
 const RoomId = ({ roomId }: RoomIdProps) => {
   let conn: WebSocket;
   let peerConnection: RTCPeerConnection;
   const [videoStream, setVideoStream] = useState<Map<string, MediaStream>>(new Map());
-
-  console.log(roomId);
+  const [localVideoStream, setLocalVideoStream] = useState<MediaStream | null>(null);
 
   useEffect(() => {
     conn = new WebSocket('ws://localhost:7181/socket');
@@ -39,17 +33,21 @@ const RoomId = ({ roomId }: RoomIdProps) => {
       const message: MessageType = JSON.parse(ev.data);
 
       switch (message.event) {
-        case JOINT:
+        case 'JOIN':
+          console.log('Receive JOIN');
           handlePeerConnection();
           break;
-        case OFFER:
+        case 'CANDIDATE':
+          console.log('Receive CANDIDATE');
+          handleIceCandidate(message.data as RTCIceCandidate);
+          break;
+        case 'OFFER':
+          console.log('Receive OFFER');
           handleOffer(message.data as RTCSessionDescription);
           break;
-        case ANSWER:
+        case 'ANSWER':
+          console.log('Receive ANSWER');
           handleAnswer(message.data as RTCSessionDescription);
-          break;
-        case CANDIDATE:
-          handleIceCandidate(message.data as RTCIceCandidate);
           break;
         default:
           break;
@@ -76,7 +74,7 @@ const RoomId = ({ roomId }: RoomIdProps) => {
 
     peerConnection.onicecandidate = (ev) => {
       if (ev.candidate) {
-        sendToSignalingServer({ event: CANDIDATE, data: ev.candidate, });
+        sendToSignalingServer({ event: 'CANDIDATE', data: ev.candidate, });
       }
     }
 
@@ -87,7 +85,7 @@ const RoomId = ({ roomId }: RoomIdProps) => {
     peerConnection.onnegotiationneeded = (() => {
       peerConnection.createOffer()
         .then((offer) => peerConnection.setLocalDescription(offer))
-        .then(() => sendToSignalingServer({ event: OFFER, data: peerConnection.localDescription as RTCSessionDescription, }));
+        .then(() => sendToSignalingServer({ event: 'OFFER', data: peerConnection.localDescription as RTCSessionDescription, }));
     });
 
     navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
@@ -116,7 +114,7 @@ const RoomId = ({ roomId }: RoomIdProps) => {
       })
       .then(() => peerConnection.createAnswer())
       .then((answer) => peerConnection.setLocalDescription(answer))
-      .then(() => sendToSignalingServer({ event: ANSWER, data: peerConnection.localDescription as RTCSessionDescription, }));
+      .then(() => sendToSignalingServer({ event: 'ANSWER', data: peerConnection.localDescription as RTCSessionDescription, }));
   }
 
   const handleAnswer = (answer: RTCSessionDescription) => {
@@ -134,8 +132,7 @@ const RoomId = ({ roomId }: RoomIdProps) => {
       <main>
         <button type='button' onClick={startVideoCall}>Start Video Call</button>
 
-        {videoStream.get('local') && <Video mediaStream={videoStream.get('local') as MediaStream} />}
-        {videoStream.get('remote') && <Video mediaStream={videoStream.get('remote') as MediaStream} />}
+        {Array.from(videoStream.keys()).map((key, idx) => <Video key={idx} mediaStream={videoStream.get(key) as MediaStream} />)}
       </main>
     </>
   );
