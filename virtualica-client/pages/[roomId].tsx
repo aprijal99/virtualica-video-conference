@@ -129,9 +129,23 @@ const RoomId = ({ roomId }: RoomIdProps) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        {Array.from(videoStream.keys()).map((key, idx) => <Video key={idx} mediaStream={videoStream.get(key) as MediaStream} />)}
+        <VideoContainer videoStream={videoStream} />
       </main>
     </>
+  );
+}
+
+const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream>, }) => {
+  const [renderedVideoStream, setRenderedVideoStream] = useState<Map<string, MediaStream>>(new Map());
+
+  useEffect(() => {
+    setRenderedVideoStream(new Map(videoStream));
+  }, [videoStream]);
+
+  return (
+    <div>
+      {Array.from(renderedVideoStream.keys()).map((key, idx) => <Video key={idx} mediaStream={renderedVideoStream.get(key) as MediaStream} />)}
+    </div>
   );
 }
 
