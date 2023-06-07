@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import {createRef, RefObject, useEffect, useRef, useState} from 'react';
+import {createRef, useEffect, useState} from 'react';
 import {GetServerSideProps} from 'next';
 
 type MessageType = {
@@ -148,6 +148,8 @@ const Video = ({ mediaStream }: { mediaStream: MediaStream, }) => {
     if (videoContainerRef.current) {
       const video: HTMLVideoElement = document.createElement('video');
       video.srcObject = mediaStream;
+      video.height = 300;
+      video.width = 300;
       video.addEventListener('loadedmetadata', () => video.play());
 
       videoContainerRef.current.append(video);
