@@ -21,12 +21,11 @@ interface RoomIdProps {
 }
 
 const RoomId = ({ roomId }: RoomIdProps) => {
-  let conn: WebSocket;
   let peerConnection: RTCPeerConnection;
   const [videoStream, setVideoStream] = useState<Map<string, MediaStream>>(new Map());
 
   useEffect(() => {
-    conn = new WebSocket('ws://localhost:7181/socket');
+    const conn: WebSocket = new WebSocket('ws://localhost:7181/socket');
 
     conn.onmessage = (ev) => {
       const message: MessageType = JSON.parse(ev.data);
@@ -52,73 +51,73 @@ const RoomId = ({ roomId }: RoomIdProps) => {
           break;
       }
     }
-  }, []);
 
-  const sendToSignalingServer = (message: MessageType) => {
-    conn.send(JSON.stringify(message));
-  }
+    conn.onopen = () => {
+      peerConnection = new RTCPeerConnection(peerConnectionConfig);
 
-  const startVideoCall = () => {
-    peerConnection = new RTCPeerConnection(peerConnectionConfig);
-
-    peerConnection.ontrack = (ev) => {
-      setVideoStream(new Map(videoStream.set('remote', ev.streams[0])));
-    }
-
-    sendToSignalingServer({ event: 'JOIN', });
-  }
-
-  const handlePeerConnection = () => {
-    peerConnection = new RTCPeerConnection(peerConnectionConfig);
-
-    peerConnection.onicecandidate = (ev) => {
-      if (ev.candidate) {
-        sendToSignalingServer({ event: 'CANDIDATE', data: ev.candidate, });
+      peerConnection.ontrack = (ev) => {
+        setVideoStream(new Map(videoStream.set('remote', ev.streams[0])));
       }
+
+      sendToSignalingServer({ event: 'JOIN', });
     }
 
-    peerConnection.ontrack = (ev) => {
-      setVideoStream(new Map(videoStream.set('remote', ev.streams[0])));
+    const sendToSignalingServer = (message: MessageType) => {
+      conn.send(JSON.stringify(message));
     }
 
-    peerConnection.onnegotiationneeded = (() => {
-      peerConnection.createOffer()
-        .then((offer) => peerConnection.setLocalDescription(offer))
-        .then(() => sendToSignalingServer({ event: 'OFFER', data: peerConnection.localDescription as RTCSessionDescription, }));
-    });
+    const handlePeerConnection = () => {
+      peerConnection = new RTCPeerConnection(peerConnectionConfig);
 
-    navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
-      .then((mediaStream) => {
-        setVideoStream(new Map(videoStream.set('local', mediaStream)));
+      peerConnection.onicecandidate = (ev) => {
+        if (ev.candidate) {
+          sendToSignalingServer({ event: 'CANDIDATE', data: ev.candidate, });
+        }
+      }
 
-        mediaStream.getTracks().forEach((mediaStreamTrack) => {
-          peerConnection.addTrack(mediaStreamTrack, mediaStream);
-        });
+      peerConnection.ontrack = (ev) => {
+        setVideoStream(new Map(videoStream.set('remote', ev.streams[0])));
+      }
+
+      peerConnection.onnegotiationneeded = (() => {
+        peerConnection.createOffer()
+          .then((offer) => peerConnection.setLocalDescription(offer))
+          .then(() => sendToSignalingServer({ event: 'OFFER', data: peerConnection.localDescription as RTCSessionDescription, }));
       });
-  }
 
-  const handleIceCandidate = (candidate: RTCIceCandidate) => {
-    peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-  }
+      navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
+        .then((mediaStream) => {
+          setVideoStream(new Map(videoStream.set('local', mediaStream)));
 
-  const handleOffer = (offer: RTCSessionDescription) => {
-    peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
-      .then(() => navigator.mediaDevices.getUserMedia({ audio: true, video: true, }))
-      .then((mediaStream) => {
-        setVideoStream(new Map(videoStream.set('local', mediaStream)));
-
-        mediaStream.getTracks().forEach((mediaStreamTrack) => {
-          peerConnection.addTrack(mediaStreamTrack, mediaStream);
+          mediaStream.getTracks().forEach((mediaStreamTrack) => {
+            peerConnection.addTrack(mediaStreamTrack, mediaStream);
+          });
         });
-      })
-      .then(() => peerConnection.createAnswer())
-      .then((answer) => peerConnection.setLocalDescription(answer))
-      .then(() => sendToSignalingServer({ event: 'ANSWER', data: peerConnection.localDescription as RTCSessionDescription, }));
-  }
+    }
 
-  const handleAnswer = (answer: RTCSessionDescription) => {
-    peerConnection.setRemoteDescription(answer);
-  }
+    const handleIceCandidate = (candidate: RTCIceCandidate) => {
+      peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+    }
+
+    const handleOffer = (offer: RTCSessionDescription) => {
+      peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
+        .then(() => navigator.mediaDevices.getUserMedia({ audio: true, video: true, }))
+        .then((mediaStream) => {
+          setVideoStream(new Map(videoStream.set('local', mediaStream)));
+
+          mediaStream.getTracks().forEach((mediaStreamTrack) => {
+            peerConnection.addTrack(mediaStreamTrack, mediaStream);
+          });
+        })
+        .then(() => peerConnection.createAnswer())
+        .then((answer) => peerConnection.setLocalDescription(answer))
+        .then(() => sendToSignalingServer({ event: 'ANSWER', data: peerConnection.localDescription as RTCSessionDescription, }));
+    }
+
+    const handleAnswer = (answer: RTCSessionDescription) => {
+      peerConnection.setRemoteDescription(answer);
+    }
+  }, []);
 
   return (
     <>
@@ -129,8 +128,6 @@ const RoomId = ({ roomId }: RoomIdProps) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <button type='button' onClick={startVideoCall}>Start Video Call</button>
-
         {Array.from(videoStream.keys()).map((key, idx) => <Video key={idx} mediaStream={videoStream.get(key) as MediaStream} />)}
       </main>
     </>
