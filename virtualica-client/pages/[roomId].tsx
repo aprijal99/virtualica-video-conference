@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import {createRef, RefObject, useEffect, useRef, useState} from 'react';
+import {GetServerSideProps} from 'next';
 
 type MessageType = {
   event: string,
@@ -13,17 +14,23 @@ const peerConnectionConfig: RTCConfiguration = {
   ],
 }
 
+interface RoomIdProps {
+  // isAuth: boolean,
+  // userEmail?: string,
+  roomId: string,
+}
+
 const OFFER: string = 'OFFER';
 const ANSWER: string = 'ANSWER';
 const CANDIDATE: string = 'CANDIDATE';
 const JOINT: string = 'JOIN';
 
-const RoomId = () => {
+const RoomId = ({ roomId }: RoomIdProps) => {
   let conn: WebSocket;
   let peerConnection: RTCPeerConnection;
   const [videoStream, setVideoStream] = useState<Map<string, MediaStream>>(new Map());
 
-  useEffect(() => console.log(videoStream), [videoStream]);
+  console.log(roomId);
 
   useEffect(() => {
     conn = new WebSocket('ws://localhost:7181/socket');
@@ -150,6 +157,16 @@ const Video = ({ mediaStream }: { mediaStream: MediaStream, }) => {
   return (
     <div ref={videoContainerRef}></div>
   )
+}
+
+export const getServerSideProps: GetServerSideProps<RoomIdProps> = async (ctx) => {
+  const props: RoomIdProps = {
+    roomId: '',
+  }
+
+  props.roomId = ctx.params?.roomId as string;
+
+  return { props, }
 }
 
 export default RoomId;
