@@ -4,6 +4,7 @@ import {GetServerSideProps} from 'next';
 
 type MessageType = {
   event: 'JOIN' | 'REQUEST' | 'CANDIDATE' | 'OFFER' | 'ANSWER',
+  senderEmail?: string,
   data?: RTCSessionDescription | RTCIceCandidate,
 }
 
@@ -33,7 +34,7 @@ const RoomId = ({ roomId, userEmail = `user-${Math.random()}` }: RoomIdProps) =>
       switch (message.event) {
         case 'REQUEST':
           console.log('Receive REQUEST');
-          handlePeerConnection();
+          handlePeerConnection(message.senderEmail as string);
           break;
         case 'CANDIDATE':
           console.log('Receive CANDIDATE');
@@ -41,7 +42,7 @@ const RoomId = ({ roomId, userEmail = `user-${Math.random()}` }: RoomIdProps) =>
           break;
         case 'OFFER':
           console.log('Receive OFFER');
-          handleOffer(message.data as RTCSessionDescription);
+          handleOffer(message.senderEmail as string, message.data as RTCSessionDescription);
           break;
         case 'ANSWER':
           console.log('Receive ANSWER');
@@ -55,23 +56,19 @@ const RoomId = ({ roomId, userEmail = `user-${Math.random()}` }: RoomIdProps) =>
     conn.onopen = () => {
       navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
         .then((mediaStream) => {
-          setVideoStream(new Map(videoStream.set('local', mediaStream)));
+          setVideoStream(new Map(videoStream.set(userEmail, mediaStream)));
         });
 
       peerConnection = new RTCPeerConnection(peerConnectionConfig);
 
-      peerConnection.ontrack = (ev) => {
-        setVideoStream(new Map(videoStream.set('remote', ev.streams[0])));
-      }
-
-      sendToSignalingServer({ event: 'REQUEST', });
+      sendToSignalingServer({ event: 'REQUEST', senderEmail: userEmail, });
     }
 
     const sendToSignalingServer = (message: MessageType) => {
       conn.send(JSON.stringify(message));
     }
 
-    const handlePeerConnection = () => {
+    const handlePeerConnection = (senderEmail: string) => {
       peerConnection = new RTCPeerConnection(peerConnectionConfig);
 
       peerConnection.onicecandidate = (ev) => {
@@ -81,13 +78,13 @@ const RoomId = ({ roomId, userEmail = `user-${Math.random()}` }: RoomIdProps) =>
       }
 
       peerConnection.ontrack = (ev) => {
-        setVideoStream(new Map(videoStream.set('remote', ev.streams[0])));
+        setVideoStream(new Map(videoStream.set(senderEmail, ev.streams[0])));
       }
 
       peerConnection.onnegotiationneeded = (() => {
         peerConnection.createOffer()
           .then((offer) => peerConnection.setLocalDescription(offer))
-          .then(() => sendToSignalingServer({ event: 'OFFER', data: peerConnection.localDescription as RTCSessionDescription, }));
+          .then(() => sendToSignalingServer({ event: 'OFFER', senderEmail: userEmail, data: peerConnection.localDescription as RTCSessionDescription, }));
       });
 
       navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
@@ -102,7 +99,11 @@ const RoomId = ({ roomId, userEmail = `user-${Math.random()}` }: RoomIdProps) =>
       peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
     }
 
-    const handleOffer = (offer: RTCSessionDescription) => {
+    const handleOffer = (senderEmail: string, offer: RTCSessionDescription) => {
+      peerConnection.ontrack = (ev) => {
+        setVideoStream(new Map(videoStream.set(senderEmail, ev.streams[0])));
+      }
+
       peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
         .then(() => navigator.mediaDevices.getUserMedia({ audio: true, video: true, }))
         .then((mediaStream) => {
@@ -144,7 +145,12 @@ const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream>
 
   return (
     <div>
-      {Array.from(renderedVideoStream.keys()).map((key, idx) => <Video key={idx} mediaStream={renderedVideoStream.get(key) as MediaStream} />)}
+      {Array.from(renderedVideoStream.keys()).map((key, idx) => (
+        <>
+          <Video key={idx} mediaStream={renderedVideoStream.get(key) as MediaStream} />
+          <div>{key}</div>
+        </>
+      ))}
     </div>
   );
 }
