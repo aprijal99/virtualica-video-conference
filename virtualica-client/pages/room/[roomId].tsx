@@ -5,144 +5,137 @@ import {useEffect, useState} from 'react';
 import {GetServerSideProps} from 'next';
 import jwtDecode from 'jwt-decode';
 
-type WsMessageType = {
-  type: 'JOIN' | 'REQUEST' | 'OFFER' | 'CANDIDATE' | 'ANSWER',
-  roomId?: string,
+type MessageType = {
+  event: 'JOIN' | 'REQUEST' | 'CANDIDATE' | 'OFFER' | 'ANSWER',
   senderEmail?: string,
   receiverEmail?: string,
+  roomId?: string,
   data?: RTCSessionDescription | RTCIceCandidate | string[],
+}
+
+const peerConnectionConfig: RTCConfiguration = {
+  iceServers: [
+    {'urls': 'stun:stun.stunprotocol.org:3478'},
+    {'urls': 'stun:stun.l.google.com:19302'},
+  ],
 }
 
 interface RoomPageProps {
   isAuth: boolean,
-  userEmail?: string,
+  userEmail: string,
   roomId: string,
 }
 
-const peerConnectionConfig: RTCConfiguration = {
-  iceServers: [],
-}
-
-const Room = ({ isAuth, userEmail = `user-${Math.random()}`, roomId }: RoomPageProps) => {
-  const peerConnection: { [n: string]: RTCPeerConnection } = {};
+const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
+  const peerHolder: Map<string, RTCPeerConnection> = new Map<string, RTCPeerConnection>();
   const [videoStream, setVideoStream] = useState<Map<string, MediaStream>>(new Map());
 
-  let localPeer: RTCPeerConnection;
-
   useEffect(() => {
-    const socket: WebSocket = new WebSocket('ws://localhost:7181/socket');
+    const conn: WebSocket = new WebSocket('ws://localhost:7181/socket');
 
-    socket.onmessage = (ev) => {
-      const wsMessage: WsMessageType = JSON.parse(ev.data);
+    conn.onmessage = (ev) => {
+      const message: MessageType = JSON.parse(ev.data);
 
-      switch (wsMessage.type) {
+      switch (message.event) {
         case 'JOIN':
           console.log('Receive JOIN');
-          handleJoin(wsMessage.data as string[]);
+          handleJoin(message.data as string[]);
           break;
         case 'REQUEST':
           console.log('Receive REQUEST');
-          handleRequest(wsMessage.senderEmail as string);
+          handlePeerConnection(message.senderEmail as string);
           break;
         case 'CANDIDATE':
           console.log('Receive CANDIDATE');
-          handleCandidate(wsMessage.senderEmail as string, wsMessage.data as RTCIceCandidate);
+          handleIceCandidate(message.senderEmail as string, message.data as RTCIceCandidate);
           break;
         case 'OFFER':
           console.log('Receive OFFER');
-          handleOffer(wsMessage.senderEmail as string, wsMessage.data as RTCSessionDescription);
+          handleOffer(message.senderEmail as string, message.data as RTCSessionDescription);
           break;
         case 'ANSWER':
           console.log('Receive ANSWER');
-          handleAnswer(wsMessage.senderEmail as string, wsMessage.data as RTCSessionDescription);
+          handleAnswer(message.senderEmail as string, message.data as RTCSessionDescription);
           break;
         default:
           break;
       }
     }
 
-    socket.onopen = () => {
-      sendToSignalingServer({ type: 'JOIN', roomId, senderEmail: userEmail, });
-      console.log('Send JOIN');
-
+    conn.onopen = () => {
       navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
-        .then((mediaStream) => setVideoStream(new Map(videoStream.set(userEmail, mediaStream))));
-    }
-
-    const sendToSignalingServer = (message: WsMessageType) => socket.send(JSON.stringify(message));
-
-    const handleJoin = (peopleArr: string[]) => {
-      if (peopleArr.length > 1) {
-        localPeer = new RTCPeerConnection(peerConnectionConfig);
-        if (localPeer) {
-          localPeer.ontrack = (ev) => {
-            setVideoStream(new Map(videoStream.set("remoteUser", ev.streams[0])));
-          };
-        }
-
-        sendToSignalingServer({ type: 'REQUEST', roomId, senderEmail: userEmail, });
-        console.log('Send REQUEST');
-      }
-    }
-
-    const handleRequest = (senderEmail: string) => {
-      localPeer = new RTCPeerConnection(peerConnectionConfig);
-
-      if (localPeer) {
-        localPeer.onicecandidate = (ev) => {
-          if (ev.candidate) {
-            sendToSignalingServer({ type: 'CANDIDATE', roomId, senderEmail: userEmail, receiverEmail: senderEmail, data: ev.candidate as RTCIceCandidate, });
-            console.log('Send CANDIDATE');
-          }
-        }
-
-        localPeer.ontrack = (ev) => {
-          setVideoStream(new Map(videoStream.set("remoteUser", ev.streams[0])));
-        }
-
-        videoStream.get(userEmail)!.getTracks().forEach((mediaStreamTrack) => {
-          localPeer.addTrack(mediaStreamTrack, videoStream.get(userEmail)!);
+        .then((mediaStream) => {
+          setVideoStream(new Map(videoStream.set(userEmail, mediaStream)));
         });
 
-        localPeer.onnegotiationneeded = () => {
-          localPeer.createOffer()
-            .then((offer) => localPeer.setLocalDescription(offer))
-            .then(() => sendToSignalingServer({ type: 'OFFER', roomId, senderEmail: userEmail, receiverEmail: senderEmail, data: localPeer.localDescription as RTCSessionDescription, }))
-            .then(() => console.log('Send OFFER'));
+      sendToSignalingServer({ event: 'JOIN', senderEmail: userEmail, roomId });
+    }
+
+    const sendToSignalingServer = (message: MessageType) => {
+      conn.send(JSON.stringify(message));
+    }
+
+    const handleJoin = (people: string[]) => {
+      if (people.length > 1) {
+        for (let i = 0; i < people.length; i++) {
+          if (people[i] === userEmail) continue;
+          peerHolder.set(people[i], new RTCPeerConnection(peerConnectionConfig));
         }
+
+        sendToSignalingServer({ event: 'REQUEST', senderEmail: userEmail, roomId });
       }
     }
 
-    const handleCandidate = (senderEmail: string, candidate: RTCIceCandidate) => {
-      if (localPeer) {
-        localPeer.addIceCandidate(new RTCIceCandidate(candidate));
+    const handlePeerConnection = (senderEmail: string) => {
+      peerHolder.set(senderEmail, new RTCPeerConnection(peerConnectionConfig));
+
+      peerHolder.get(senderEmail)!.onicecandidate = (ev) => {
+        if (ev.candidate) {
+          sendToSignalingServer({ event: 'CANDIDATE', senderEmail: userEmail, receiverEmail: senderEmail, roomId, data: ev.candidate, });
+        }
       }
+
+      peerHolder.get(senderEmail)!.ontrack = (ev) => {
+        setVideoStream(new Map(videoStream.set(senderEmail, ev.streams[0])));
+      }
+
+      peerHolder.get(senderEmail)!.onnegotiationneeded = () => {
+        peerHolder.get(senderEmail)!.createOffer()
+          .then((offer) => peerHolder.get(senderEmail)!.setLocalDescription(offer))
+          .then(() => sendToSignalingServer({ event: 'OFFER', senderEmail: userEmail, receiverEmail: senderEmail, roomId, data: peerHolder.get(senderEmail)!.localDescription as RTCSessionDescription, }));
+      };
+
+      navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
+        .then((mediaStream) => {
+          mediaStream.getTracks().forEach((mediaStreamTrack) => {
+            peerHolder.get(senderEmail)!.addTrack(mediaStreamTrack, mediaStream);
+          });
+        });
+    }
+
+    const handleIceCandidate = (senderEmail: string, candidate: RTCIceCandidate) => {
+      peerHolder.get(senderEmail)!.addIceCandidate(new RTCIceCandidate(candidate));
     }
 
     const handleOffer = (senderEmail: string, offer: RTCSessionDescription) => {
-      if (localPeer) {
-        localPeer.setRemoteDescription(new RTCSessionDescription(offer))
-          .then(() => {
-            navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
-              .then((mediaStream) => {
-                mediaStream.getTracks().forEach((mediaStreamTrack) => {
-                  localPeer.addTrack(mediaStreamTrack, mediaStream);
-                });
-              });
-          })
-          .then(() => {
-            localPeer.createAnswer()
-              .then((answer) => localPeer.setLocalDescription(answer))
-              .then(() => sendToSignalingServer({ type: 'ANSWER', roomId, senderEmail: userEmail, receiverEmail: senderEmail, data: localPeer.localDescription as RTCSessionDescription}))
-              .then(() => console.log('Send ANSWER'));
-          });
+      peerHolder.get(senderEmail)!.ontrack = (ev) => {
+        setVideoStream(new Map(videoStream.set(senderEmail, ev.streams[0])));
       }
+
+      peerHolder.get(senderEmail)!.setRemoteDescription(new RTCSessionDescription(offer))
+        .then(() => navigator.mediaDevices.getUserMedia({ audio: true, video: true, }))
+        .then((mediaStream) => {
+          mediaStream.getTracks().forEach((mediaStreamTrack) => {
+            peerHolder.get(senderEmail)!.addTrack(mediaStreamTrack, mediaStream);
+          });
+        })
+        .then(() => peerHolder.get(senderEmail)!.createAnswer())
+        .then((answer) => peerHolder.get(senderEmail)!.setLocalDescription(answer))
+        .then(() => sendToSignalingServer({ event: 'ANSWER', senderEmail: userEmail, receiverEmail: senderEmail, roomId, data: peerHolder.get(senderEmail)!.localDescription as RTCSessionDescription, }));
     }
 
     const handleAnswer = (senderEmail: string, answer: RTCSessionDescription) => {
-      if (localPeer) {
-        localPeer.setRemoteDescription(answer);
-      }
+      peerHolder.get(senderEmail)!.setRemoteDescription(answer);
     }
   }, []);
 
@@ -164,7 +157,7 @@ const Room = ({ isAuth, userEmail = `user-${Math.random()}`, roomId }: RoomPageP
 export const getServerSideProps: GetServerSideProps<RoomPageProps> = async (ctx) => {
   const props: RoomPageProps = {
     isAuth: false,
-    // userEmail: '',
+    userEmail: `user-${Math.random()}`,
     roomId: '',
   }
 

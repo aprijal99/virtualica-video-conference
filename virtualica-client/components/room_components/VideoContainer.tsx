@@ -3,41 +3,6 @@ import {grey} from '@mui/material/colors';
 import {MicOffOutlined} from '@mui/icons-material';
 import {createRef, useEffect, useRef, useState} from 'react';
 
-const Video = ({ name, stream }: { name: string, stream: MediaStream | null }) => {
-  const videoRef = createRef<HTMLVideoElement>();
-
-  useEffect(() => {
-    if (stream && videoRef.current) {
-      videoRef.current.srcObject = stream;
-      videoRef.current.addEventListener('loadedmetadata', () => videoRef.current?.play());
-    }
-  }, [stream]);
-
-  return (
-    <Box
-      id={name} display='flex' flexGrow='1'
-      sx={{ bgcolor: grey['800'], borderRadius: '10px', position: 'relative', overflow: 'hidden', }}
-    >
-      {/*<Avatar*/}
-      {/*  sx={{ height: '60px', width: '60px', bgcolor: nameToColor('Aprijal Ghiyas Setiawan'), }}*/}
-      {/*  children={<Typography sx={{ color: 'white', fontSize: '25px', }}>AG</Typography>}*/}
-      {/*/>*/}
-      <video ref={videoRef} style={{ position: 'absolute', width: '100%', height: '100%', }} />
-      <Typography
-        sx={{
-          fontSize: '15px', position: 'absolute', bottom: '10px', left: '10px', maxWidth: '75%',
-          whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden',
-      }}
-      >
-        {name}
-      </Typography>
-      <Avatar sx={{ height: '25px', width: '25px', bgcolor: 'rgba(0, 0, 0, 0.3)', position: 'absolute', top: '10px', right: '10px', }}>
-        <MicOffOutlined sx={{ fontSize: '18px', color: 'white', }} />
-      </Avatar>
-    </Box>
-  );
-}
-
 const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream>, }) => {
   const [videosRestriction, setVideosRestriction] = useState<{ renderedVideos: Map<string, MediaStream>, maxRowNum: number, maxColNum: number, } | null>(null);
   const [widthHeight, setWidthHeight] = useState<{ width: number, height: number} | null>(null);
@@ -128,14 +93,14 @@ const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream>
     let rowNum = 1;
     gridMap.map(val => rowNum = (val[1] + 1) > rowNum ? val[1] + 1 : rowNum);
 
-    const groupVideos: Map<string, MediaStream | null>[][] = [];
+    const groupVideos: Map<string, MediaStream>[][] = [];
     for (let i = 0; i < rowNum; i++) groupVideos.push([]);
 
     const keys: string[] = Array.from(renderedVideos.keys());
     for (let j = 0; j < renderedVideos.size; j++) {
       const itemKey: string = keys[j];
-      const itemVal = renderedVideos.get(itemKey) as MediaStream | null;
-      const item = new Map<string, MediaStream | null>();
+      const itemVal = renderedVideos.get(itemKey) as MediaStream;
+      const item = new Map<string, MediaStream>();
       item.set(itemKey, itemVal);
       groupVideos[gridMap[j][1]].push(item);
     }
@@ -146,7 +111,7 @@ const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream>
           <Box key={idx} display='flex' columnGap='10px' >
             {videos.map((val, idx) => {
               const itemKey: string = Array.from(val.keys())[0];
-              return <Video key={idx} name={itemKey} stream={val.get(itemKey) as MediaStream | null} />
+              return <Video key={idx} name={itemKey} mediaStream={val.get(itemKey) as MediaStream} />
             })}
           </Box>
         ))}
@@ -160,6 +125,47 @@ const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream>
       <Box ref={videosWrapperRef} display='flex' flexGrow='1' flexDirection='column' sx={{ overflow: 'hidden', }}>
         {videosRestriction && renderVideos(videosRestriction)}
       </Box>
+    </Box>
+  );
+}
+
+const Video = ({ name, mediaStream }: { name: string, mediaStream: MediaStream }) => {
+  const videoBoxRef = createRef<HTMLDivElement>();
+
+  useEffect(() => {
+    if (videoBoxRef.current) {
+      const video: HTMLVideoElement = document.createElement('video');
+      video.srcObject = mediaStream;
+      video.style.width = '100%';
+      video.style.height = '100%';
+      video.style.position = 'absolute';
+      video.addEventListener('loadedmetadata', () => video.play());
+
+      videoBoxRef.current.append(video);
+    }
+  }, []);
+
+  return (
+    <Box
+      display='flex' flexGrow='1' ref={videoBoxRef}
+      sx={{ bgcolor: grey['800'], borderRadius: '10px', position: 'relative', overflow: 'hidden', }}
+    >
+      {/*<Avatar*/}
+      {/*  sx={{ height: '60px', width: '60px', bgcolor: nameToColor('Aprijal Ghiyas Setiawan'), }}*/}
+      {/*  children={<Typography sx={{ color: 'white', fontSize: '25px', }}>AG</Typography>}*/}
+      {/*/>*/}
+
+      <Typography
+        sx={{
+          fontSize: '15px', position: 'absolute', bottom: '10px', left: '10px', maxWidth: '75%',
+          whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden',
+        }}
+      >
+        {name}
+      </Typography>
+      <Avatar sx={{ height: '25px', width: '25px', bgcolor: 'rgba(0, 0, 0, 0.3)', position: 'absolute', top: '10px', right: '10px', }}>
+        <MicOffOutlined sx={{ fontSize: '18px', color: 'white', }} />
+      </Avatar>
     </Box>
   );
 }
