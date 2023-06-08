@@ -35,6 +35,8 @@ public class SessionServiceImpl implements SessionService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        System.out.println(roomSessions.get(roomId));
     }
 
     @Override
@@ -73,6 +75,8 @@ public class SessionServiceImpl implements SessionService {
             String userEmail = roomIdAndUserEmail.get(1);
 
             roomSessions.get(roomId).remove(userEmail);
+
+            System.out.println(roomSessions.get(roomId));
         }
     }
 
