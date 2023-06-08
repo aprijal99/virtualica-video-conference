@@ -5,7 +5,9 @@ import {GetServerSideProps} from 'next';
 type MessageType = {
   event: 'JOIN' | 'REQUEST' | 'CANDIDATE' | 'OFFER' | 'ANSWER',
   senderEmail?: string,
-  data?: RTCSessionDescription | RTCIceCandidate,
+  receiverEmail?: string,
+  roomId?: string,
+  data?: RTCSessionDescription | RTCIceCandidate | string[],
 }
 
 const peerConnectionConfig: RTCConfiguration = {
@@ -32,6 +34,10 @@ const RoomId = ({ roomId, userEmail = `user-${Math.random()}` }: RoomIdProps) =>
       const message: MessageType = JSON.parse(ev.data);
 
       switch (message.event) {
+        case 'JOIN':
+          console.log('Receive JOIN');
+          handleJoin(message.data as string[]);
+          break;
         case 'REQUEST':
           console.log('Receive REQUEST');
           handlePeerConnection(message.senderEmail as string);
@@ -61,11 +67,17 @@ const RoomId = ({ roomId, userEmail = `user-${Math.random()}` }: RoomIdProps) =>
 
       peerConnection = new RTCPeerConnection(peerConnectionConfig);
 
-      sendToSignalingServer({ event: 'REQUEST', senderEmail: userEmail, });
+      sendToSignalingServer({ event: 'JOIN', senderEmail: userEmail, roomId });
     }
 
     const sendToSignalingServer = (message: MessageType) => {
       conn.send(JSON.stringify(message));
+    }
+
+    const handleJoin = (people: string[]) => {
+      if (people.length > 1) {
+        sendToSignalingServer({ event: 'REQUEST', senderEmail: userEmail, roomId });
+      }
     }
 
     const handlePeerConnection = (senderEmail: string) => {
@@ -73,7 +85,7 @@ const RoomId = ({ roomId, userEmail = `user-${Math.random()}` }: RoomIdProps) =>
 
       peerConnection.onicecandidate = (ev) => {
         if (ev.candidate) {
-          sendToSignalingServer({ event: 'CANDIDATE', data: ev.candidate, });
+          sendToSignalingServer({ event: 'CANDIDATE', senderEmail: userEmail, receiverEmail: senderEmail, roomId, data: ev.candidate, });
         }
       }
 
@@ -84,7 +96,7 @@ const RoomId = ({ roomId, userEmail = `user-${Math.random()}` }: RoomIdProps) =>
       peerConnection.onnegotiationneeded = (() => {
         peerConnection.createOffer()
           .then((offer) => peerConnection.setLocalDescription(offer))
-          .then(() => sendToSignalingServer({ event: 'OFFER', senderEmail: userEmail, data: peerConnection.localDescription as RTCSessionDescription, }));
+          .then(() => sendToSignalingServer({ event: 'OFFER', senderEmail: userEmail, receiverEmail: senderEmail, roomId, data: peerConnection.localDescription as RTCSessionDescription, }));
       });
 
       navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
@@ -113,7 +125,7 @@ const RoomId = ({ roomId, userEmail = `user-${Math.random()}` }: RoomIdProps) =>
         })
         .then(() => peerConnection.createAnswer())
         .then((answer) => peerConnection.setLocalDescription(answer))
-        .then(() => sendToSignalingServer({ event: 'ANSWER', data: peerConnection.localDescription as RTCSessionDescription, }));
+        .then(() => sendToSignalingServer({ event: 'ANSWER', senderEmail: userEmail, receiverEmail: senderEmail, roomId, data: peerConnection.localDescription as RTCSessionDescription, }));
     }
 
     const handleAnswer = (answer: RTCSessionDescription) => {
