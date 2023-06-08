@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import virtualica.entity.Room;
 import virtualica.entity.User;
 import virtualica.service.RoomService;
+import virtualica.service.SessionService;
 import virtualica.service.UserService;
 
 import java.sql.Timestamp;
@@ -18,7 +19,7 @@ public class VirtualicaServerApplication {
 	}
 
 	@Bean
-	public CommandLineRunner runner(UserService userService, RoomService roomService) {
+	public CommandLineRunner runner(UserService userService, RoomService roomService, SessionService sessionService) {
 		return args -> {
 			User ghiyas = User.builder().name("Aprijal Ghiyas Setiawan").email("aprijalghiyas@gmail.com").password("subang12345").role("ADMIN").build();
 			User ainun = User.builder().name("Ainun Nisa").email("ainunnisa@gmail.com").password("bandung2002").role("USER").build();
@@ -44,6 +45,8 @@ public class VirtualicaServerApplication {
 
 			roomService.saveRoom(room1);
 			roomService.saveRoom(room2);
+
+			sessionService.addRoom("123");
 		};
 	}
 }

@@ -3,7 +3,7 @@ import {createRef, useEffect, useState} from 'react';
 import {GetServerSideProps} from 'next';
 
 type MessageType = {
-  event: 'JOIN' | 'CANDIDATE' | 'OFFER' | 'ANSWER',
+  event: 'JOIN' | 'REQUEST' | 'CANDIDATE' | 'OFFER' | 'ANSWER',
   data?: RTCSessionDescription | RTCIceCandidate,
 }
 
@@ -16,11 +16,11 @@ const peerConnectionConfig: RTCConfiguration = {
 
 interface RoomIdProps {
   // isAuth: boolean,
-  // userEmail?: string,
+  userEmail?: string,
   roomId: string,
 }
 
-const RoomId = ({ roomId }: RoomIdProps) => {
+const RoomId = ({ roomId, userEmail = `user-${Math.random()}` }: RoomIdProps) => {
   let peerConnection: RTCPeerConnection;
   const [videoStream, setVideoStream] = useState<Map<string, MediaStream>>(new Map());
 
@@ -31,8 +31,8 @@ const RoomId = ({ roomId }: RoomIdProps) => {
       const message: MessageType = JSON.parse(ev.data);
 
       switch (message.event) {
-        case 'JOIN':
-          console.log('Receive JOIN');
+        case 'REQUEST':
+          console.log('Receive REQUEST');
           handlePeerConnection();
           break;
         case 'CANDIDATE':
@@ -64,7 +64,7 @@ const RoomId = ({ roomId }: RoomIdProps) => {
         setVideoStream(new Map(videoStream.set('remote', ev.streams[0])));
       }
 
-      sendToSignalingServer({ event: 'JOIN', });
+      sendToSignalingServer({ event: 'REQUEST', });
     }
 
     const sendToSignalingServer = (message: MessageType) => {
