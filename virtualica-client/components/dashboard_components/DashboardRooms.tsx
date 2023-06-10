@@ -172,8 +172,7 @@ const DashboardRooms = () => {
                   >
                     {['Deki Geraldi', 'Ainun Nisa', 'Irsyad Ibadurrahman', 'Deki Geraldi', 'Ainun Nisa', 'Irsyad Ibadurrahman', 'Deki Geraldi', 'Ainun Nisa', 'Irsyad Ibadurrahman'].map((val, idx) => (
                       <ListItem
-                        key={idx}
-                        disablePadding
+                        key={idx} disablePadding
                         secondaryAction={
                           <Checkbox edge='end' />
                         }

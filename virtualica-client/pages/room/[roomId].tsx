@@ -4,6 +4,8 @@ import VideoContainer from '@/components/room_components/VideoContainer';
 import {useEffect, useState} from 'react';
 import {GetServerSideProps} from 'next';
 import jwtDecode from 'jwt-decode';
+import {grey} from '@mui/material/colors';
+import PeopleList from '@/components/room_components/PeopleList';
 
 type MessageType = {
   event: 'JOIN' | 'REQUEST' | 'CANDIDATE' | 'OFFER' | 'ANSWER',
@@ -63,10 +65,10 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
     }
 
     conn.onopen = () => {
-      navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
-        .then((mediaStream) => {
-          setVideoStream(new Map(videoStream.set(userEmail, mediaStream)));
-        });
+      // navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
+      //   .then((mediaStream) => {
+      //     setVideoStream(new Map(videoStream.set(userEmail, mediaStream)));
+      //   });
 
       sendToSignalingServer({ event: 'JOIN', senderEmail: userEmail, roomId });
     }
@@ -142,8 +144,13 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
   return (
     isAuth ?
       <Box display='flex' flexDirection='column' sx={{ height: '100vh', mx: 2, }}>
-        {/* VIDEO */}
-        <VideoContainer videoStream={videoStream} />
+        <Box display='flex' flexGrow='1' sx={{ mt: 2, }}>
+          {/* VIDEO */}
+          <VideoContainer videoStream={videoStream} />
+
+          {/* PEOPLE LIST */}
+          <PeopleList />
+        </Box>
 
         {/* NAVIGATION */}
         <RoomNavBar />

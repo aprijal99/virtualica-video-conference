@@ -120,7 +120,7 @@ const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream>
   }
 
   return (
-    <Box display='flex' flexDirection='column' flexGrow='1' sx={{ mt: 2, overflow: 'hidden', }}>
+    <Box display='flex' flexDirection='column' flexGrow='1' sx={{ overflow: 'hidden', height: '100%', bgcolor: grey.A700, }}>
       <Typography sx={{ mb: 2, '@media (min-width: 600px)': { display: 'none', }, }}>Team Meeting</Typography>
       <Box ref={videosWrapperRef} display='flex' flexGrow='1' flexDirection='column' sx={{ overflow: 'hidden', }}>
         {videosRestriction && renderVideos(videosRestriction)}
@@ -158,12 +158,12 @@ const Video = ({ name, mediaStream }: { name: string, mediaStream: MediaStream }
       <Typography
         sx={{
           fontSize: '15px', position: 'absolute', bottom: '10px', left: '10px', maxWidth: '75%',
-          whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden',
+          whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', zIndex: '5',
         }}
       >
         {name}
       </Typography>
-      <Avatar sx={{ height: '25px', width: '25px', bgcolor: 'rgba(0, 0, 0, 0.3)', position: 'absolute', top: '10px', right: '10px', }}>
+      <Avatar sx={{ height: '25px', width: '25px', bgcolor: 'rgba(0, 0, 0, 0.3)', position: 'absolute', top: '10px', right: '10px', zIndex: '5', }}>
         <MicOffOutlined sx={{ fontSize: '18px', color: 'white', }} />
       </Avatar>
     </Box>
