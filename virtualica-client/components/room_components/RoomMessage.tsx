@@ -1,5 +1,5 @@
-import {Avatar, Box, IconButton, InputAdornment, TextField, Typography} from '@mui/material';
-import {Close, MoreVert, Search, Send} from '@mui/icons-material';
+import {Box, InputAdornment, TextField, Typography} from '@mui/material';
+import {Close, Send} from '@mui/icons-material';
 import {grey} from '@mui/material/colors';
 import React from 'react';
 

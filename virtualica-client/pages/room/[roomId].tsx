@@ -7,6 +7,7 @@ import jwtDecode from 'jwt-decode';
 import {grey} from '@mui/material/colors';
 import PeopleList from '@/components/room_components/PeopleList';
 import RoomMessage from '@/components/room_components/RoomMessage';
+import MeetingDetails from '@/components/room_components/MeetingDetails';
 
 type MessageType = {
   event: 'JOIN' | 'REQUEST' | 'CANDIDATE' | 'OFFER' | 'ANSWER',
@@ -150,8 +151,9 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
           <VideoContainer videoStream={videoStream} />
 
           {/* PEOPLE LIST */}
-          {/*<PeopleList />*/}
-          <RoomMessage />
+          <PeopleList />
+          {/*<RoomMessage />*/}
+          {/*<MeetingDetails />*/}
         </Box>
 
         {/* NAVIGATION */}
