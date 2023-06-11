@@ -1,13 +1,14 @@
 import {Box} from '@mui/material';
 import RoomNavBar from '@/components/room_components/RoomNavBar';
 import VideoContainer from '@/components/room_components/VideoContainer';
-import {useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {GetServerSideProps} from 'next';
 import jwtDecode from 'jwt-decode';
 import {grey} from '@mui/material/colors';
 import PeopleList from '@/components/room_components/PeopleList';
 import RoomMessage from '@/components/room_components/RoomMessage';
 import MeetingDetails from '@/components/room_components/MeetingDetails';
+import {RoomDialogContext} from '@/context/RoomDialogProvider';
 
 type MessageType = {
   event: 'JOIN' | 'REQUEST' | 'CANDIDATE' | 'OFFER' | 'ANSWER',
@@ -164,14 +165,16 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
 }
 
 const RoomDialog = () => {
+  const { dialogStatus } = useContext(RoomDialogContext);
+
   return (
     <Box
       display='flex' flexDirection='column'
       sx={{ p: 3, overflow: 'hidden', minWidth: '350px', maxWidth: '350px', height: '100%', bgcolor: 'white', color: 'black', ml: 2, borderRadius: '10px', }}
     >
-      <PeopleList />
-      {/*<RoomMessage />*/}
-      {/*<MeetingDetails />*/}
+      {dialogStatus === 'people' && <PeopleList />}
+      {dialogStatus === 'message' && <RoomMessage />}
+      {dialogStatus === 'info' && <MeetingDetails />}
     </Box>
   );
 }
