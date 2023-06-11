@@ -150,10 +150,8 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
           {/* VIDEO */}
           <VideoContainer videoStream={videoStream} />
 
-          {/* PEOPLE LIST */}
-          <PeopleList />
-          {/*<RoomMessage />*/}
-          {/*<MeetingDetails />*/}
+          {/* ROOM DIALOG */}
+          <RoomDialog />
         </Box>
 
         {/* NAVIGATION */}
@@ -162,6 +160,19 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
       <Box>
         Please login to your account in Home page
       </Box>
+  );
+}
+
+const RoomDialog = () => {
+  return (
+    <Box
+      display='flex' flexDirection='column'
+      sx={{ p: 3, overflow: 'hidden', minWidth: '350px', maxWidth: '350px', height: '100%', bgcolor: 'white', color: 'black', ml: 2, borderRadius: '10px', }}
+    >
+      <PeopleList />
+      {/*<RoomMessage />*/}
+      {/*<MeetingDetails />*/}
+    </Box>
   );
 }
 

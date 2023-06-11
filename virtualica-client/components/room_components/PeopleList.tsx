@@ -5,7 +5,7 @@ import React from 'react';
 
 const PeopleList = () => {
   return (
-    <Box sx={{ p: 3, minWidth: '350px', maxWidth: '350px', height: '100%', bgcolor: 'white', color: 'black', ml: 2, borderRadius: '10px', }}>
+    <>
       <Box display='flex' alignItems='center' justifyContent='space-between' sx={{ mb: 3, }}>
         <Typography variant='h6' sx={{ fontWeight: '400', }}>People</Typography>
         <Close sx={{ cursor: 'pointer', }} />
@@ -14,7 +14,7 @@ const PeopleList = () => {
       <TextField
         fullWidth={true} autoComplete='off' placeholder='Search for people'
         sx={{
-           mb: 2,
+          mb: 2,
           'input': { py: 1, pr: 1, color: 'black', },
           '.MuiInputBase-root': {
             pl: 1.5,
@@ -45,7 +45,7 @@ const PeopleList = () => {
           </IconButton>
         </Box>
       </Box>
-    </Box>
+    </>
   );
 }
 

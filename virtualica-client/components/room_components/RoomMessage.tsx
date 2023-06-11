@@ -5,10 +5,7 @@ import React from 'react';
 
 const RoomMessage = () => {
   return (
-    <Box
-      display='flex' flexDirection='column'
-      sx={{ p: 3, overflow: 'hidden', minWidth: '350px', maxWidth: '350px', height: '100%', bgcolor: 'white', color: 'black', ml: 2, borderRadius: '10px', }}
-    >
+    <>
       <Box display='flex' alignItems='center' justifyContent='space-between' sx={{ mb: 3, }}>
         <Typography variant='h6' sx={{ fontWeight: '400', }}>Messages</Typography>
         <Close sx={{ cursor: 'pointer', }} />
@@ -51,7 +48,7 @@ const RoomMessage = () => {
           ),
         }}
       />
-    </Box>
+    </>
   )
 }
 
