@@ -8,8 +8,12 @@ import {
   MoreVert, PeopleAltOutlined,
   VideocamOutlined
 } from '@mui/icons-material';
+import {useContext} from 'react';
+import {RoomDialogContext} from '@/context/RoomDialogProvider';
 
 const RoomNavBar = () => {
+  const { changeDialogStatus } = useContext(RoomDialogContext);
+
   return (
     <Box
       display='flex' justifyContent='center' alignItems='center' columnGap='20px'
@@ -48,9 +52,15 @@ const RoomNavBar = () => {
         display='flex' columnGap='20px' flexBasis='33.333%' justifyContent='end'
         sx={{ display: 'none', '@media (min-width: 600px)': { display: 'flex', }, }}
       >
-        <MessageOutlined sx={{ color: 'white', cursor: 'pointer', }} />
-        <PeopleAltOutlined sx={{ color: 'white', cursor: 'pointer', }} />
-        <ErrorOutline sx={{ color: 'white', cursor: 'pointer', }} />
+        <Box onClick={() => changeDialogStatus!('people')}>
+          <MessageOutlined sx={{ color: 'white', cursor: 'pointer', }} />
+        </Box>
+        <Box onClick={() => changeDialogStatus!('message')}>
+          <PeopleAltOutlined sx={{ color: 'white', cursor: 'pointer', }} />
+        </Box>
+        <Box onClick={() => changeDialogStatus!('info')}>
+          <ErrorOutline sx={{ color: 'white', cursor: 'pointer', }} />
+        </Box>
       </Box>
     </Box>
   );
