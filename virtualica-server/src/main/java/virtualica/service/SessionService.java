@@ -11,6 +11,7 @@ public interface SessionService {
     Map<String, WebSocketSession> getRoomSessions(String roomId);
     void sendRequestMessage(String roomId, String senderEmail, TextMessage textMessage);
     void sendOfferCandidateAndAnswerMessage(String roomId, String receiverEmail, TextMessage textMessage);
+    void sendChatMessage(String roomId, String senderEmail, TextMessage textMessage);
     void deleteSession(WebSocketSession webSocketSession);
     void deleteRoom(String roomId);
 }

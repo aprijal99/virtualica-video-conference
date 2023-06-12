@@ -31,6 +31,7 @@ public class SocketHandler extends TextWebSocketHandler {
                 String receiverEmail = (String) map.get("receiverEmail");
                 sessionService.sendOfferCandidateAndAnswerMessage(roomId, receiverEmail, textMessage);
             }
+            case "MESSAGE" -> sessionService.sendChatMessage(roomId, senderEmail, textMessage);
         }
     }
 

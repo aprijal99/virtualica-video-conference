@@ -67,6 +67,19 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
+    public void sendChatMessage(String roomId, String senderEmail, TextMessage textMessage) {
+        this.getRoomSessions(roomId).forEach((email, session) -> {
+            if (session.isOpen() && !email.equals(senderEmail)) {
+                try {
+                    session.sendMessage(textMessage);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+
+    @Override
     public void deleteSession(WebSocketSession webSocketSession) {
         List<String> roomIdAndUserEmail = sessionInfo.get(webSocketSession.getId());
 
