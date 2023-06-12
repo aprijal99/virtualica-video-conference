@@ -1,7 +1,8 @@
 import {Avatar, Box, Typography} from '@mui/material';
 import {grey} from '@mui/material/colors';
 import {MicOffOutlined} from '@mui/icons-material';
-import {createRef, useEffect, useRef, useState} from 'react';
+import {createRef, useContext, useEffect, useRef, useState} from 'react';
+import {RoomDialogContext} from '@/context/RoomDialogProvider';
 
 const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream>, }) => {
   const [videosRestriction, setVideosRestriction] = useState<{ renderedVideos: Map<string, MediaStream>, maxRowNum: number, maxColNum: number, } | null>(null);
@@ -119,8 +120,16 @@ const VideoContainer = ({ videoStream }: { videoStream: Map<string, MediaStream>
     );
   }
 
+  const { dialogStatus } = useContext(RoomDialogContext);
+
   return (
-    <Box display='flex' flexDirection='column' flexGrow='1' sx={{ overflow: 'hidden', height: '100%', bgcolor: grey.A700, }}>
+    <Box
+      display='flex' flexDirection='column' flexGrow='1'
+      sx={{
+        overflow: 'hidden', height: '100%', bgcolor: grey.A700,
+        mr: dialogStatus === '' ? '-366px' : '0px', transition: 'margin 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+      }}
+    >
       <Typography sx={{ mb: 2, '@media (min-width: 600px)': { display: 'none', }, }}>Team Meeting</Typography>
       <Box ref={videosWrapperRef} display='flex' flexGrow='1' flexDirection='column' sx={{ overflow: 'hidden', }}>
         {videosRestriction && renderVideos(videosRestriction)}

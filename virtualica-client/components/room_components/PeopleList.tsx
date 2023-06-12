@@ -6,11 +6,6 @@ import React from 'react';
 const PeopleList = () => {
   return (
     <>
-      <Box display='flex' alignItems='center' justifyContent='space-between' sx={{ mb: 3, }}>
-        <Typography variant='h6' sx={{ fontWeight: '400', }}>People</Typography>
-        <Close sx={{ cursor: 'pointer', }} />
-      </Box>
-
       <TextField
         fullWidth={true} autoComplete='off' placeholder='Search for people'
         sx={{

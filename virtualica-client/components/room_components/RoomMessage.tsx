@@ -6,11 +6,6 @@ import React from 'react';
 const RoomMessage = () => {
   return (
     <>
-      <Box display='flex' alignItems='center' justifyContent='space-between' sx={{ mb: 3, }}>
-        <Typography variant='h6' sx={{ fontWeight: '400', }}>Messages</Typography>
-        <Close sx={{ cursor: 'pointer', }} />
-      </Box>
-
       <Typography align='center' sx={{ bgcolor: grey['200'], fontSize: '.8rem', p: 1, borderRadius: '5px', mb: 3, }}>
         Messages can only be seen by people in the call and are deleted when the call ends
       </Typography>

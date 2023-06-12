@@ -1,7 +1,7 @@
-import {Box} from '@mui/material';
+import {Box, Typography} from '@mui/material';
 import RoomNavBar from '@/components/room_components/RoomNavBar';
 import VideoContainer from '@/components/room_components/VideoContainer';
-import {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {GetServerSideProps} from 'next';
 import jwtDecode from 'jwt-decode';
 import {grey} from '@mui/material/colors';
@@ -9,6 +9,7 @@ import PeopleList from '@/components/room_components/PeopleList';
 import RoomMessage from '@/components/room_components/RoomMessage';
 import MeetingDetails from '@/components/room_components/MeetingDetails';
 import {RoomDialogContext} from '@/context/RoomDialogProvider';
+import {Close} from '@mui/icons-material';
 
 type MessageType = {
   event: 'JOIN' | 'REQUEST' | 'CANDIDATE' | 'OFFER' | 'ANSWER',
@@ -73,7 +74,7 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
       //     setVideoStream(new Map(videoStream.set(userEmail, mediaStream)));
       //   });
 
-      sendToSignalingServer({ event: 'JOIN', senderEmail: userEmail, roomId });
+      // sendToSignalingServer({ event: 'JOIN', senderEmail: userEmail, roomId });
     }
 
     const sendToSignalingServer = (message: MessageType) => {
@@ -147,7 +148,7 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
   return (
     isAuth ?
       <Box display='flex' flexDirection='column' sx={{ height: '100vh', mx: 2, }}>
-        <Box display='flex' flexGrow='1' sx={{ mt: 2, }}>
+        <Box display='flex' flexGrow='1' sx={{ mt: 2, overflow: 'hidden', }}>
           {/* VIDEO */}
           <VideoContainer videoStream={videoStream} />
 
@@ -165,13 +166,26 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
 }
 
 const RoomDialog = () => {
-  const { dialogStatus } = useContext(RoomDialogContext);
+  const { dialogStatus, changeDialogStatus } = useContext(RoomDialogContext);
 
   return (
     <Box
       display='flex' flexDirection='column'
-      sx={{ p: 3, overflow: 'hidden', minWidth: '350px', maxWidth: '350px', height: '100%', bgcolor: 'white', color: 'black', ml: 2, borderRadius: '10px', }}
+      sx={{
+        p: 3, overflow: 'hidden', minWidth: '350px', maxWidth: '350px', height: '100%', bgcolor: 'white', color: 'black', ml: 2, borderRadius: '10px',
+        transform: dialogStatus === '' ? 'translateX(366px)' : '', transition: 'transform 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+      }}
     >
+      <Box display='flex' alignItems='center' justifyContent='space-between' sx={{ mb: 3, }}>
+        <Typography variant='h6' sx={{ fontWeight: '400', }}>
+          {dialogStatus === 'people' && 'People'}
+          {dialogStatus === 'message' && 'Messages'}
+          {dialogStatus === 'info' && 'Meeting Details'}
+        </Typography>
+        <Box display='flex' onClick={() => changeDialogStatus!('')}>
+          <Close sx={{ cursor: 'pointer', }} />
+        </Box>
+      </Box>
       {dialogStatus === 'people' && <PeopleList />}
       {dialogStatus === 'message' && <RoomMessage />}
       {dialogStatus === 'info' && <MeetingDetails />}

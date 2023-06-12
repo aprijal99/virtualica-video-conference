@@ -6,7 +6,7 @@ interface RoomDialogContextProps {
 }
 
 const initialRoomDialogContext: RoomDialogContextProps = {
-  dialogStatus: 'people',
+  dialogStatus: '',
 }
 
 export const RoomDialogContext = createContext<RoomDialogContextProps>(initialRoomDialogContext);
