@@ -1,20 +1,37 @@
 import {Box, InputAdornment, TextField, Typography} from '@mui/material';
 import {Send} from '@mui/icons-material';
 import {grey} from '@mui/material/colors';
-import React, {createRef, useState} from 'react';
+import React, {useState} from 'react';
+import {WsMessageType} from '@/pages/room/[roomId]';
+import {RoomMessageType} from '@/context/RoomMessageProvider';
 
 const RoomMessage = ({ webSocket }: { webSocket: WebSocket | null, }) => {
   const [message, setMessage] = useState<string>('');
 
-  const handleSendMessageClick = () => {
-    console.log(message);
+  const sendMessage = (message: string) => {
+    const roomMessage: RoomMessageType = {
+      message,
+      senderName: 'aprijal',
+      date: new Date().getDate(),
+    }
+
+    const wsMessage: WsMessageType = {
+      event: 'MESSAGE',
+      roomId: '123',
+      data: roomMessage as RoomMessageType,
+    }
+
+    webSocket?.send(JSON.stringify(wsMessage));
     setMessage('');
+  }
+
+  const handleSendMessageClick = () => {
+    sendMessage(message);
   }
 
   const handleSendMessageEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.code === 'Enter' || e.which === 13) {
-      console.log(message);
-      setMessage('');
+      sendMessage(message);
     }
   }
 

@@ -4,19 +4,19 @@ import VideoContainer from '@/components/room_components/VideoContainer';
 import React, {useContext, useEffect, useState} from 'react';
 import {GetServerSideProps} from 'next';
 import jwtDecode from 'jwt-decode';
-import {grey} from '@mui/material/colors';
 import PeopleList from '@/components/room_components/PeopleList';
 import RoomMessage from '@/components/room_components/RoomMessage';
 import MeetingDetails from '@/components/room_components/MeetingDetails';
 import {RoomDialogContext} from '@/context/RoomDialogProvider';
 import {Close} from '@mui/icons-material';
+import {RoomMessageType} from '@/context/RoomMessageProvider';
 
-type MessageType = {
-  event: 'JOIN' | 'REQUEST' | 'CANDIDATE' | 'OFFER' | 'ANSWER',
+export type WsMessageType = {
+  event: 'JOIN' | 'REQUEST' | 'CANDIDATE' | 'OFFER' | 'ANSWER' | 'MESSAGE',
   senderEmail?: string,
   receiverEmail?: string,
   roomId?: string,
-  data?: RTCSessionDescription | RTCIceCandidate | string[],
+  data?: RTCSessionDescription | RTCIceCandidate | string[] | RoomMessageType,
 }
 
 const peerConnectionConfig: RTCConfiguration = {
@@ -41,7 +41,7 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
     const conn: WebSocket = new WebSocket('ws://localhost:7181/socket');
 
     conn.onmessage = (ev) => {
-      const message: MessageType = JSON.parse(ev.data);
+      const message: WsMessageType = JSON.parse(ev.data);
 
       switch (message.event) {
         case 'JOIN':
@@ -80,7 +80,7 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
       setWebSocket(conn);
     }
 
-    const sendToSignalingServer = (message: MessageType) => {
+    const sendToSignalingServer = (message: WsMessageType) => {
       conn.send(JSON.stringify(message));
     }
 

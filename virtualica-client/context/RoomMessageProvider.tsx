@@ -1,6 +1,6 @@
 import {createContext, ReactNode, useState} from 'react';
 
-type RoomMessageType = {
+export type RoomMessageType = {
   message: string,
   senderName: string,
   date: number,
