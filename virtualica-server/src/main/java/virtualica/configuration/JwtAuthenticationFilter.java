@@ -23,6 +23,7 @@ import virtualica.util.ApiResponse;
 import virtualica.util.CookieUtil;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -71,9 +72,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 "refresh_token", refreshToken
         );
 
+        Base64.Encoder base64Encoder = Base64.getEncoder();
+
         response.addCookie(CookieUtil.generateCookie("access_token", accessToken));
-        response.addCookie(CookieUtil.generateCookie("user_name", "AprijalGhiyasSetiawan"));
-        response.addCookie(CookieUtil.generateCookie("user_email", "aprijalghiyas@gmail.com"));
+        response.addCookie(CookieUtil.generateCookie("user_name", base64Encoder.encodeToString("Aprijal Ghiyas Setiawan".getBytes())));
+        response.addCookie(CookieUtil.generateCookie("user_email", base64Encoder.encodeToString("aprijalghiyas@gmail.com".getBytes())));
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.OK.value());

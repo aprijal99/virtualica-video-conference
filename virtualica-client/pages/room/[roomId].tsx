@@ -29,10 +29,11 @@ const peerConnectionConfig: RTCConfiguration = {
 interface RoomPageProps {
   isAuth: boolean,
   userEmail: string,
+  userName: string,
   roomId: string,
 }
 
-const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
+const Room = ({ isAuth, userEmail, userName, roomId }: RoomPageProps) => {
   const peerHolder: Map<string, RTCPeerConnection> = new Map<string, RTCPeerConnection>();
   const [videoStream, setVideoStream] = useState<Map<string, MediaStream>>(new Map());
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
@@ -200,6 +201,7 @@ export const getServerSideProps: GetServerSideProps<RoomPageProps> = async (ctx)
   const props: RoomPageProps = {
     isAuth: false,
     userEmail: `user-${Math.random()}`,
+    userName: '',
     roomId: '',
   }
 
@@ -210,8 +212,12 @@ export const getServerSideProps: GetServerSideProps<RoomPageProps> = async (ctx)
   const isValid: boolean = decodedAccessToken.exp > Date.now() / 1000;
   if (!isValid) return { props, }
 
+  const userName: string | undefined = ctx.req.cookies['user_name'];
+  const userEmail: string | undefined = ctx.req.cookies['user_email'];
+
   props.isAuth = true;
-  // props.userEmail = decodedAccessToken.sub;
+  // props.userEmail = userEmail;
+  props.userName = userName as string;
   props.roomId = ctx.params?.roomId as string;
 
   return { props, }
