@@ -9,7 +9,6 @@ import CustomBackdrop from '../components/feedback_components/CustomBackdrop';
 import CustomSnackbar from '../components/feedback_components/CustomSnackbar';
 import {GetServerSideProps} from 'next';
 import jwtDecode from 'jwt-decode';
-import cookie from 'cookie';
 
 const Home = ({ isAuth }: { isAuth: boolean, }) => {
   const { backdrop, alert, alertMessage, toggleAlert } = useContext(FeedbackContext);
@@ -66,11 +65,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       isAuth: false,
     },
   }
-
-  // ctx.res.setHeader('Set-Cookie', [
-  //   cookie.serialize('name', "Aprijal Ghiyas Setiawan", ),
-  //   cookie.serialize('email', "aprijalghiyas@gmail.com", ),
-  // ]);
 
   return {
     props: {

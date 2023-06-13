@@ -212,8 +212,8 @@ export const getServerSideProps: GetServerSideProps<RoomPageProps> = async (ctx)
   const isValid: boolean = decodedAccessToken.exp > Date.now() / 1000;
   if (!isValid) return { props, }
 
-  const userName: string | undefined = ctx.req.cookies['user_name'];
-  const userEmail: string | undefined = ctx.req.cookies['user_email'];
+  const userName: string = atob(ctx.req.cookies['user_name'] as string);
+  const userEmail: string = atob(ctx.req.cookies['user_email'] as string);
 
   props.isAuth = true;
   // props.userEmail = userEmail;
