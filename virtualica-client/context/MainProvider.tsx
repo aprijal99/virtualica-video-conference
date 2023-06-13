@@ -3,6 +3,7 @@ import {ReactNode} from 'react';
 import RoomProvider from '@/context/RoomProvider';
 import FeedbackProvider from '@/context/FeedbackProvider';
 import RoomDialogProvider from '@/context/RoomDialogProvider';
+import RoomMessageProvider from '@/context/RoomMessageProvider';
 
 const MainProvider = ({ children }: { children: ReactNode, }) => {
   return (
@@ -10,7 +11,9 @@ const MainProvider = ({ children }: { children: ReactNode, }) => {
       <RoomProvider>
         <FeedbackProvider>
           <RoomDialogProvider>
-            {children}
+            <RoomMessageProvider>
+              {children}
+            </RoomMessageProvider>
           </RoomDialogProvider>
         </FeedbackProvider>
       </RoomProvider>
