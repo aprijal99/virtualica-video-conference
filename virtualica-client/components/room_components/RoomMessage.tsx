@@ -1,9 +1,23 @@
 import {Box, InputAdornment, TextField, Typography} from '@mui/material';
-import {Close, Send} from '@mui/icons-material';
+import {Send} from '@mui/icons-material';
 import {grey} from '@mui/material/colors';
-import React from 'react';
+import React, {createRef, useState} from 'react';
 
-const RoomMessage = () => {
+const RoomMessage = ({ webSocket }: { webSocket: WebSocket | null, }) => {
+  const [message, setMessage] = useState<string>('');
+
+  const handleSendMessageClick = () => {
+    console.log(message);
+    setMessage('');
+  }
+
+  const handleSendMessageEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.code === 'Enter' || e.which === 13) {
+      console.log(message);
+      setMessage('');
+    }
+  }
+
   return (
     <>
       <Typography align='center' sx={{ bgcolor: grey['200'], fontSize: '.8rem', p: 1, borderRadius: '5px', mb: 3, }}>
@@ -22,6 +36,7 @@ const RoomMessage = () => {
       </Box>
 
       <TextField
+        value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleSendMessageEnter}
         fullWidth={true} autoComplete='off' placeholder='Send a message'
         sx={{
           mt: 3,
@@ -38,7 +53,9 @@ const RoomMessage = () => {
         InputProps={{
           endAdornment: (
             <InputAdornment position='end'>
-              <Send sx={{ fontSize: '22px', color: '#8b8b8b', cursor: 'pointer', }} />
+              <Box display='flex' sx={{ cursor: 'pointer', }} onClick={handleSendMessageClick}>
+                <Send sx={{ fontSize: '22px', color: '#8b8b8b', }} />
+              </Box>
             </InputAdornment>
           ),
         }}

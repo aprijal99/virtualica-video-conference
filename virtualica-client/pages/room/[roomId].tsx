@@ -35,6 +35,7 @@ interface RoomPageProps {
 const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
   const peerHolder: Map<string, RTCPeerConnection> = new Map<string, RTCPeerConnection>();
   const [videoStream, setVideoStream] = useState<Map<string, MediaStream>>(new Map());
+  const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
     const conn: WebSocket = new WebSocket('ws://localhost:7181/socket');
@@ -75,6 +76,8 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
       //   });
 
       // sendToSignalingServer({ event: 'JOIN', senderEmail: userEmail, roomId });
+
+      setWebSocket(conn);
     }
 
     const sendToSignalingServer = (message: MessageType) => {
@@ -153,7 +156,7 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
           <VideoContainer videoStream={videoStream} />
 
           {/* ROOM DIALOG */}
-          <RoomDialog />
+          <RoomDialog webSocket={webSocket} />
         </Box>
 
         {/* NAVIGATION */}
@@ -165,7 +168,7 @@ const Room = ({ isAuth, userEmail, roomId }: RoomPageProps) => {
   );
 }
 
-const RoomDialog = () => {
+const RoomDialog = ({ webSocket }: { webSocket: WebSocket | null, }) => {
   const { dialogStatus, changeDialogStatus } = useContext(RoomDialogContext);
 
   return (
@@ -187,7 +190,7 @@ const RoomDialog = () => {
         </Box>
       </Box>
       {dialogStatus === 'people' && <PeopleList />}
-      {dialogStatus === 'message' && <RoomMessage />}
+      {dialogStatus === 'message' && <RoomMessage webSocket={webSocket} />}
       {dialogStatus === 'info' && <MeetingDetails />}
     </Box>
   );

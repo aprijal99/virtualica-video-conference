@@ -52,10 +52,10 @@ const RoomNavBar = () => {
         display='flex' columnGap='20px' flexBasis='33.333%' justifyContent='end'
         sx={{ display: 'none', '@media (min-width: 600px)': { display: 'flex', }, }}
       >
-        <Box onClick={() => changeDialogStatus!('people')}>
+        <Box onClick={() => changeDialogStatus!('message')}>
           <MessageOutlined sx={{ color: 'white', cursor: 'pointer', }} />
         </Box>
-        <Box onClick={() => changeDialogStatus!('message')}>
+        <Box onClick={() => changeDialogStatus!('people')}>
           <PeopleAltOutlined sx={{ color: 'white', cursor: 'pointer', }} />
         </Box>
         <Box onClick={() => changeDialogStatus!('info')}>

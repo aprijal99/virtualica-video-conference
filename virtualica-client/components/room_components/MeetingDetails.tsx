@@ -1,5 +1,5 @@
 import {Box, Typography} from '@mui/material';
-import {Close, ContentCopy} from '@mui/icons-material';
+import {ContentCopy} from '@mui/icons-material';
 import {grey} from '@mui/material/colors';
 import React from 'react';
 
