@@ -5,28 +5,28 @@ import DashboardRooms from '@/components/dashboard_components/DashboardRooms';
 import {useContext, useEffect, useState} from 'react';
 import DashboardContacts from '@/components/dashboard_components/DashboardContacts';
 import jwtDecode from 'jwt-decode';
-import {UserContext, UserType} from '@/context/UserProvider';
+import {UserContext} from '@/context/UserProvider';
 import {ApiType} from '@/type/api';
-import {GetServerSideProps} from 'next';
+import {GetServerSideProps, Redirect} from 'next';
 import cookie from 'cookie';
 import {RoomContext, RoomType} from '@/context/RoomProvider';
 import {FeedbackContext} from '@/context/FeedbackProvider';
 import CustomBackdrop from '@/components/feedback_components/CustomBackdrop';
 import CustomSnackbar from '@/components/feedback_components/CustomSnackbar';
 
-const Dashboard = ({ userData }: { userData: UserType, }) => {
+const Dashboard = ({ userName, userEmail }: { userName: string, userEmail: string, }) => {
   const [tabValue, setTabValue] = useState<number>(0);
   const { backdrop, alert, alertMessage, toggleAlert } = useContext(FeedbackContext);
   const { handleSetUserData } = useContext(UserContext);
   const { handleAddRoomList } = useContext(RoomContext);
 
   useEffect(() => {
-    if (handleSetUserData) handleSetUserData(userData);
+    handleSetUserData!({ name: userName, email: userEmail });
     getRoomList();
   }, []);
 
   const getRoomList = async () => {
-    const fetchResult = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/room/room-list/${userData.email}`);
+    const fetchResult = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/room/room-list/${userEmail}`);
     const apiResult: ApiType<RoomType[]> = await fetchResult.json();
     if (handleAddRoomList) handleAddRoomList(apiResult.data as RoomType[]);
   }
@@ -47,39 +47,35 @@ const Dashboard = ({ userData }: { userData: UserType, }) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const redirect: Redirect = {
+    destination: '/',
+    statusCode: 302,
+  }
+
   if (ctx.req.method === 'POST') {
-    ctx.res.setHeader('Set-Cookie', cookie.serialize('access_token', '', { maxAge: 0, }));
-    return {
-      redirect: {
-        destination: '/',
-        statusCode: 302,
-      },
-    }
+    ctx.res.setHeader('Set-Cookie', [
+      cookie.serialize('access_token', '', { maxAge: 0, }),
+      cookie.serialize('user_name', '', { maxAge: 0, }),
+      cookie.serialize('user_email', '', { maxAge: 0, }),
+    ]);
+
+    return { redirect, }
   }
 
   const accessToken: string | undefined = ctx.req.cookies['access_token'];
-  if (accessToken === undefined) return  {
-    redirect: {
-      destination: '/',
-      statusCode: 302,
-    },
-  }
+  if (accessToken === undefined) return { redirect, }
 
   const decodedAccessToken: { sub: string, roles: string[], iss: string, exp: number, } = jwtDecode(accessToken);
   const isValid: boolean = decodedAccessToken.exp > Date.now() / 1000;
-  if (!isValid) return  {
-    redirect: {
-      destination: '/',
-      statusCode: 302,
-    },
-  }
+  if (!isValid) return { redirect, }
 
-  const result = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/user?email=${decodedAccessToken.sub}`);
-  const apiResult: ApiType<UserType> = await result.json();
+  const userName: string | undefined = ctx.req.cookies['user_name'];
+  const userEmail: string | undefined = ctx.req.cookies['user_email'];
 
   return {
     props: {
-      userData: apiResult.data,
+      userName: userName as string,
+      userEmail: userEmail as string,
     },
   }
 }

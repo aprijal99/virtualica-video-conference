@@ -36,11 +36,6 @@ public class SocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
-        System.out.println(session.getId());
-    }
-
-    @Override
     public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus status) {
         sessionService.deleteSession(webSocketSession);
     }

@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,9 +20,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import virtualica.util.ApiResponse;
+import virtualica.util.CookieUtil;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Date;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -48,7 +47,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
         User principal = (User) authResult.getPrincipal();
         Algorithm algorithm = Algorithm.HMAC256(this.jwtSecret.getBytes());
 
@@ -72,20 +71,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 "refresh_token", refreshToken
         );
 
-        ResponseCookie responseCookie = ResponseCookie.from("access_token", accessToken)
-                .httpOnly(true)
-                .secure(false) // 'true' in https mode
-                .path("/")
-                .sameSite("lax")
-                .maxAge(Duration.ofHours(4))
-                .build();
-
+        response.addCookie(CookieUtil.generateCookie("access_token", accessToken));
+        response.addCookie(CookieUtil.generateCookie("user_name", "AprijalGhiyasSetiawan"));
+        response.addCookie(CookieUtil.generateCookie("user_email", "aprijalghiyas@gmail.com"));
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.OK.value());
         response.addHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:3000");
         response.addHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
-        response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
+
         new ObjectMapper().writeValue(
                 response.getOutputStream(),
                 ApiResponse.jsonWithData(HttpStatus.OK, tokens)
