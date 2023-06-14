@@ -12,10 +12,13 @@ interface RoomMessageContextProps {
 }
 
 const initialRoomMessageContext: RoomMessageContextProps = {
-  roomMessage: [],
+  roomMessage: [
+    { message: 'Hallo guys, how are you?', senderName: 'Aprijal Ghiyas Setiawan', date: new Date().getTime(), },
+    { message: 'I\'m good', senderName: 'Deki Geraldi', date: new Date().getTime(), },
+  ],
 }
 
-const RoomMessageContext = createContext<RoomMessageContextProps>(initialRoomMessageContext);
+export const RoomMessageContext = createContext<RoomMessageContextProps>(initialRoomMessageContext);
 
 const RoomMessageProvider = ({ children }: { children: ReactNode, }) => {
   const [roomMessage, setRoomMessage] = useState<RoomMessageType[]>(initialRoomMessageContext.roomMessage);

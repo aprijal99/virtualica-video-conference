@@ -1,12 +1,13 @@
 import {Box, InputAdornment, TextField, Typography} from '@mui/material';
 import {Send} from '@mui/icons-material';
 import {grey} from '@mui/material/colors';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {WsMessageType} from '@/pages/room/[roomId]';
-import {RoomMessageType} from '@/context/RoomMessageProvider';
+import {RoomMessageContext, RoomMessageType} from '@/context/RoomMessageProvider';
 
 const RoomMessage = ({ webSocket }: { webSocket: WebSocket | null, }) => {
   const [message, setMessage] = useState<string>('');
+  const { roomMessage } = useContext(RoomMessageContext);
 
   const sendMessage = (message: string) => {
     const roomMessage: RoomMessageType = {
@@ -48,7 +49,7 @@ const RoomMessage = ({ webSocket }: { webSocket: WebSocket | null, }) => {
         }}
       >
         <Box sx={{ display: 'block', position: 'absolute', width: '100%', pl: 3, pr: 2, }}>
-
+          {roomMessage.map((roomMessage, idx) => <Message key={idx} roomMessage={roomMessage} />)}
         </Box>
       </Box>
 
@@ -79,6 +80,20 @@ const RoomMessage = ({ webSocket }: { webSocket: WebSocket | null, }) => {
       />
     </>
   )
+}
+
+const Message = ({ roomMessage }: { roomMessage: RoomMessageType, }) => {
+  return (
+    <Box sx={{ fontSize: '.9rem', mb: 2.5, }}>
+      <Box display='flex' columnGap='10px' sx={{ mb: .5, }}>
+        <Typography sx={{ fontSize: '.9rem', fontWeight: '500', }}>{roomMessage.senderName}</Typography>
+        <Typography sx={{ fontSize: '.9rem', color: grey['800'], }}>
+          {new Date(roomMessage.date).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true, })}
+        </Typography>
+      </Box>
+      {roomMessage.message}
+    </Box>
+  );
 }
 
 export default RoomMessage;
