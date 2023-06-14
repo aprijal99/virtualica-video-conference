@@ -49,7 +49,14 @@ const RoomMessage = ({ webSocket }: { webSocket: WebSocket | null, }) => {
         }}
       >
         <Box sx={{ display: 'block', position: 'absolute', width: '100%', pl: 3, pr: 2, }}>
-          {roomMessage.map((roomMessage, idx) => <Message key={idx} roomMessage={roomMessage} />)}
+          {roomMessage.map((rm, idx) => {
+            let sameSender: boolean = false;
+            if (idx !== 0) {
+              sameSender = roomMessage[idx - 1].senderName === rm.senderName;
+            }
+
+            return <Message key={idx} sameSender={sameSender} roomMessage={rm} />;
+          })}
         </Box>
       </Box>
 
@@ -82,15 +89,17 @@ const RoomMessage = ({ webSocket }: { webSocket: WebSocket | null, }) => {
   )
 }
 
-const Message = ({ roomMessage }: { roomMessage: RoomMessageType, }) => {
+const Message = ({ sameSender, roomMessage }: { sameSender: boolean, roomMessage: RoomMessageType, }) => {
   return (
-    <Box sx={{ fontSize: '.9rem', mb: 2.5, }}>
-      <Box display='flex' columnGap='10px' sx={{ mb: .5, }}>
-        <Typography sx={{ fontSize: '.9rem', fontWeight: '500', }}>{roomMessage.senderName}</Typography>
-        <Typography sx={{ fontSize: '.9rem', color: grey['800'], }}>
-          {new Date(roomMessage.date).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true, })}
-        </Typography>
-      </Box>
+    <Box sx={{ fontSize: '.9rem', mt: sameSender ? .5 : 2.5, }}>
+      {!sameSender && (
+        <Box display='flex' columnGap='10px' sx={{ mb: .5, }}>
+          <Typography sx={{ fontSize: '.9rem', fontWeight: '500', }}>{roomMessage.senderName}</Typography>
+          <Typography sx={{ fontSize: '.9rem', color: grey['800'], }}>
+            {new Date(roomMessage.date).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true, })}
+          </Typography>
+        </Box>
+      )}
       {roomMessage.message}
     </Box>
   );
