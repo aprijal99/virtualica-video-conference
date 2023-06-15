@@ -156,7 +156,7 @@ const Room = ({ isAuth, userEmail, userName, roomId }: RoomPageProps) => {
           <VideoContainer videoStream={videoStream} />
 
           {/* ROOM DIALOG */}
-          <RoomDialog webSocket={webSocket} />
+          <RoomDialog webSocket={webSocket} userName={userName} roomId={roomId} />
         </Box>
 
         {/* NAVIGATION */}
@@ -168,7 +168,7 @@ const Room = ({ isAuth, userEmail, userName, roomId }: RoomPageProps) => {
   );
 }
 
-const RoomDialog = ({ webSocket }: { webSocket: WebSocket | null, }) => {
+const RoomDialog = ({ webSocket, userName, roomId }: { webSocket: WebSocket | null, userName: string, roomId: string, }) => {
   const { dialogStatus, changeDialogStatus } = useContext(RoomDialogContext);
 
   return (
@@ -190,7 +190,7 @@ const RoomDialog = ({ webSocket }: { webSocket: WebSocket | null, }) => {
         </Box>
       </Box>
       {dialogStatus === 'people' && <PeopleList />}
-      {dialogStatus === 'message' && <RoomMessage webSocket={webSocket} />}
+      {dialogStatus === 'message' && <RoomMessage webSocket={webSocket} userName={userName} roomId={roomId} />}
       {dialogStatus === 'info' && <MeetingDetails />}
     </Box>
   );

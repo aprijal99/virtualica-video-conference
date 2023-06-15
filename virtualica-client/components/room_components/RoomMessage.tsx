@@ -5,24 +5,25 @@ import React, {useContext, useState} from 'react';
 import {WsMessageType} from '@/pages/room/[roomId]';
 import {RoomMessageContext, RoomMessageType} from '@/context/RoomMessageProvider';
 
-const RoomMessage = ({ webSocket }: { webSocket: WebSocket | null, }) => {
+const RoomMessage = ({ webSocket, userName, roomId }: { webSocket: WebSocket | null, userName: string, roomId: string, }) => {
   const [message, setMessage] = useState<string>('');
-  const { roomMessage } = useContext(RoomMessageContext);
+  const { roomMessage, addRoomMessage } = useContext(RoomMessageContext);
 
   const sendMessage = (message: string) => {
     const roomMessage: RoomMessageType = {
       message,
-      senderName: 'aprijal',
+      senderName: userName,
       date: new Date().getDate(),
     }
 
     const wsMessage: WsMessageType = {
       event: 'MESSAGE',
-      roomId: '123',
+      roomId: roomId,
       data: roomMessage as RoomMessageType,
     }
 
     webSocket?.send(JSON.stringify(wsMessage));
+    addRoomMessage!(roomMessage);
     setMessage('');
   }
 
