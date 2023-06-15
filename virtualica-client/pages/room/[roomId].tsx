@@ -9,7 +9,7 @@ import RoomMessage from '@/components/room_components/RoomMessage';
 import MeetingDetails from '@/components/room_components/MeetingDetails';
 import {RoomDialogContext} from '@/context/RoomDialogProvider';
 import {Close} from '@mui/icons-material';
-import {RoomMessageType} from '@/context/RoomMessageProvider';
+import {RoomMessageContext, RoomMessageType} from '@/context/RoomMessageProvider';
 
 export type WsMessageType = {
   event: 'JOIN' | 'REQUEST' | 'CANDIDATE' | 'OFFER' | 'ANSWER' | 'MESSAGE',
@@ -37,6 +37,7 @@ const Room = ({ isAuth, userEmail, userName, roomId }: RoomPageProps) => {
   const peerHolder: Map<string, RTCPeerConnection> = new Map<string, RTCPeerConnection>();
   const [videoStream, setVideoStream] = useState<Map<string, MediaStream>>(new Map());
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
+  const { addRoomMessage } = useContext(RoomMessageContext);
 
   useEffect(() => {
     const conn: WebSocket = new WebSocket('ws://localhost:7181/socket');
@@ -46,25 +47,23 @@ const Room = ({ isAuth, userEmail, userName, roomId }: RoomPageProps) => {
 
       switch (message.event) {
         case 'JOIN':
-          console.log('Receive JOIN');
           handleJoin(message.data as string[]);
           break;
         case 'REQUEST':
-          console.log('Receive REQUEST');
           handlePeerConnection(message.senderEmail as string);
           break;
         case 'CANDIDATE':
-          console.log('Receive CANDIDATE');
           handleIceCandidate(message.senderEmail as string, message.data as RTCIceCandidate);
           break;
         case 'OFFER':
-          console.log('Receive OFFER');
           handleOffer(message.senderEmail as string, message.data as RTCSessionDescription);
           break;
         case 'ANSWER':
-          console.log('Receive ANSWER');
           handleAnswer(message.senderEmail as string, message.data as RTCSessionDescription);
           break;
+        case 'MESSAGE':
+          addRoomMessage!(message.data as RoomMessageType);
+          break
         default:
           break;
       }
