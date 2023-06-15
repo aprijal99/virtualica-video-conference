@@ -4,21 +4,26 @@ import {grey} from '@mui/material/colors';
 import React, {useContext, useState} from 'react';
 import {WsMessageType} from '@/pages/room/[roomId]';
 import {RoomMessageContext, RoomMessageType} from '@/context/RoomMessageProvider';
+import {UserContext} from '@/context/UserProvider';
+import {useRouter} from 'next/router';
 
-const RoomMessage = ({ webSocket, userName, roomId }: { webSocket: WebSocket | null, userName: string, roomId: string, }) => {
+const RoomMessage = ({ webSocket, }: { webSocket: WebSocket | null, }) => {
+  const router = useRouter();
   const [message, setMessage] = useState<string>('');
+  const { userData } = useContext(UserContext);
   const { roomMessage, addRoomMessage } = useContext(RoomMessageContext);
 
   const sendMessage = (message: string) => {
     const roomMessage: RoomMessageType = {
       message,
-      senderName: userName,
+      senderName: userData.name,
       date: new Date().getDate(),
     }
 
     const wsMessage: WsMessageType = {
       event: 'MESSAGE',
-      roomId: roomId,
+      senderEmail: userData.email,
+      roomId: router.query.roomId as string,
       data: roomMessage as RoomMessageType,
     }
 

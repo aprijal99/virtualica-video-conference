@@ -10,6 +10,7 @@ import MeetingDetails from '@/components/room_components/MeetingDetails';
 import {RoomDialogContext} from '@/context/RoomDialogProvider';
 import {Close} from '@mui/icons-material';
 import {RoomMessageContext, RoomMessageType} from '@/context/RoomMessageProvider';
+import {UserContext} from '@/context/UserProvider';
 
 export type WsMessageType = {
   event: 'JOIN' | 'REQUEST' | 'CANDIDATE' | 'OFFER' | 'ANSWER' | 'MESSAGE',
@@ -38,6 +39,9 @@ const Room = ({ isAuth, userEmail, userName, roomId }: RoomPageProps) => {
   const [videoStream, setVideoStream] = useState<Map<string, MediaStream>>(new Map());
   const [webSocket, setWebSocket] = useState<WebSocket | null>(null);
   const { addRoomMessage } = useContext(RoomMessageContext);
+  const { handleSetUserData } = useContext(UserContext);
+
+  useEffect(() => handleSetUserData!({ name: userEmail, email: userEmail, }), []);
 
   useEffect(() => {
     const conn: WebSocket = new WebSocket('ws://localhost:7181/socket');
@@ -70,12 +74,12 @@ const Room = ({ isAuth, userEmail, userName, roomId }: RoomPageProps) => {
     }
 
     conn.onopen = () => {
-      // navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
-      //   .then((mediaStream) => {
-      //     setVideoStream(new Map(videoStream.set(userEmail, mediaStream)));
-      //   });
+      navigator.mediaDevices.getUserMedia({ audio: true, video: true, })
+        .then((mediaStream) => {
+          setVideoStream(new Map(videoStream.set(userEmail, mediaStream)));
+        });
 
-      // sendToSignalingServer({ event: 'JOIN', senderEmail: userEmail, roomId });
+      sendToSignalingServer({ event: 'JOIN', senderEmail: userEmail, roomId });
 
       setWebSocket(conn);
     }
@@ -156,7 +160,7 @@ const Room = ({ isAuth, userEmail, userName, roomId }: RoomPageProps) => {
           <VideoContainer videoStream={videoStream} />
 
           {/* ROOM DIALOG */}
-          <RoomDialog webSocket={webSocket} userName={userName} roomId={roomId} />
+          <RoomDialog webSocket={webSocket} />
         </Box>
 
         {/* NAVIGATION */}
@@ -168,7 +172,7 @@ const Room = ({ isAuth, userEmail, userName, roomId }: RoomPageProps) => {
   );
 }
 
-const RoomDialog = ({ webSocket, userName, roomId }: { webSocket: WebSocket | null, userName: string, roomId: string, }) => {
+const RoomDialog = ({ webSocket, }: { webSocket: WebSocket | null, }) => {
   const { dialogStatus, changeDialogStatus } = useContext(RoomDialogContext);
 
   return (
@@ -190,7 +194,7 @@ const RoomDialog = ({ webSocket, userName, roomId }: { webSocket: WebSocket | nu
         </Box>
       </Box>
       {dialogStatus === 'people' && <PeopleList />}
-      {dialogStatus === 'message' && <RoomMessage webSocket={webSocket} userName={userName} roomId={roomId} />}
+      {dialogStatus === 'message' && <RoomMessage webSocket={webSocket} />}
       {dialogStatus === 'info' && <MeetingDetails />}
     </Box>
   );
