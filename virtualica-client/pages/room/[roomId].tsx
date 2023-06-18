@@ -41,7 +41,7 @@ const Room = ({ isAuth, userEmail, userName, roomId }: RoomPageProps) => {
   const { addRoomMessage } = useContext(RoomMessageContext);
   const { handleSetUserData } = useContext(UserContext);
 
-  useEffect(() => handleSetUserData!({ name: userEmail, email: userEmail, }), []);
+  useEffect(() => handleSetUserData!({ name: userEmail, email: userEmail, }), []); // 'name' value must be changed to userName
 
   useEffect(() => {
     const conn: WebSocket = new WebSocket('ws://localhost:7181/socket');

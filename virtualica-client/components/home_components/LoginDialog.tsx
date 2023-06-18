@@ -11,7 +11,7 @@ import {
   useMediaQuery
 } from '@mui/material';
 import {Close, LockOutlined} from '@mui/icons-material';
-import {useContext, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {blue} from '@mui/material/colors';
 import {ApiType} from '@/type/api';
 import {FeedbackContext} from '@/context/FeedbackProvider';
@@ -52,6 +52,12 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
     if (toggleAlert) toggleAlert();
   }
 
+  const handleLoginOnEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.code === 'Enter' || e.which === 13) {
+      handleLogin();
+    }
+  }
+
   return (
     <Dialog open={openLoginDialog} onClose={handleCloseLoginDialog} maxWidth='xs' fullScreen={useMediaQuery('(max-width: 599px)')}>
       <Box sx={{ maxWidth: '400px', mx: 'auto' }}>
@@ -64,11 +70,11 @@ const LoginDialog = ({ openLoginDialog, handleCloseLoginDialog }: { openLoginDia
         </DialogTitle>
         <DialogContent sx={{ flexGrow: '0', p: '24px !important', }}>
           <TextField
-            fullWidth label='Email Address' variant='outlined'
+            fullWidth label='Email Address' variant='outlined' onKeyDown={handleLoginOnEnter}
             value={email} onChange={(e) => setEmail(e.target.value)} sx={{ mb: 2, }}
           />
           <TextField
-            fullWidth label='Password' variant='outlined' type='password'
+            fullWidth label='Password' variant='outlined' type='password' onKeyDown={handleLoginOnEnter}
             value={password} onChange={(e) => setPassword(e.target.value)} sx={{ mb: 1, }}
           />
           <FormControlLabel control={<Checkbox disableRipple />} label='Remember me' sx={{ mb: 1, }} />
