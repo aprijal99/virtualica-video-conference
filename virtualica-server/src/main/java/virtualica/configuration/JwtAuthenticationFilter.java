@@ -95,6 +95,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.addHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:3000");
         response.addHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+
         new ObjectMapper().writeValue(
                 response.getOutputStream(),
                 ApiResponse.jsonNoData(HttpStatus.UNAUTHORIZED)

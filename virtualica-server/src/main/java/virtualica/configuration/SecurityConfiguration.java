@@ -42,7 +42,9 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-            HttpSecurity httpSecurity, JwtAuthenticationFilter jwtAuthenticationFilter, JwtAuthorizationFilter jwtAuthorizationFilter
+            HttpSecurity httpSecurity,
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            JwtAuthorizationFilter jwtAuthorizationFilter
     ) throws Exception {
         jwtAuthenticationFilter.setFilterProcessesUrl("/login");
 
